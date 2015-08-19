@@ -1,0 +1,14 @@
+ - hosts: 192.168.1.69
+   sudo: yes
+   #roles:
+   #- mongodb
+   tasks:
+   - name: install pip modules
+     pip: name="{{item}}" state="present"
+     with_items:
+     - flask
+     - fastkml
+     - lxml
+   #- name: make sure unzip is installed
+   #  apt: name="unzip" state="present"
+
