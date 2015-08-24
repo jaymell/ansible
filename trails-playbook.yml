@@ -7,8 +7,8 @@
      pip: name="{{item}}" state="present"
      with_items:
      - flask
-     - fastkml
-     - lxml
+     #- fastkml
+     #- lxml
    #- name: make sure unzip is installed
    #  apt: name="unzip" state="present"
 

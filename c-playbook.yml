@@ -1,0 +1,19 @@
+ - hosts: 192.168.1.69
+   sudo: yes
+   vars: 
+     tlpi_url: http://man7.org/tlpi/code/download
+     tlpi_gz: tlpi-150424-dist.tar.gz
+
+   tasks:
+
+   - name: install coreutils source to /usr/src
+     command: chdir=/usr/src /usr/bin/apt-get source coreutils
+
+   - name: download _the_linux_programming_interface_ source code
+     get_url: url="{{tlpi_url}}/{{tlpi_gz}}" dest=/tmp
+
+   - name: extract tlpi source
+     unarchive: src="/tmp/{{tlpi_gz}}" dest=/usr/src
+
+   # verify linux header files installed
+   # verify compiler installed

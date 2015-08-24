@@ -1,0 +1,10 @@
+  - name: Install apache2
+    apt: pkg={{item}} state=present
+    with_items:
+    - apache2
+
+  - name: apache enabled
+    service: name=apache2 enabled=yes
+
+  - name: start apache
+    service: name=apache2 state=started
