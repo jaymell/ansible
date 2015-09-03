@@ -1,4 +1,4 @@
- - hosts: 192.168.1.69
+ - hosts: netbook
    sudo: yes
    vars: 
      tlpi_url: http://man7.org/tlpi/code/download
@@ -14,6 +14,11 @@
 
    - name: extract tlpi source
      unarchive: src="/tmp/{{tlpi_gz}}" dest=/usr/src
+
+   - name: debian install linux headers
+     # unfortunately this is not reliable, as available headers may not
+     # correspond exactly to current kernel version:
+     apt: name="linux-headers-{{ansible_kernel}}" state=present
 
    # verify linux header files installed
    # verify compiler installed

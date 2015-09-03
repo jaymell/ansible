@@ -1,0 +1,26 @@
+ - hosts: netbook
+   sudo: yes
+   vars: 
+     tlpi_url: http://man7.org/tlpi/code/download
+     tlpi_gz: tlpi-150424-dist.tar.gz
+
+   tasks:
+
+   - name: download _the_linux_programming_interface_ source code
+     get_url: url="{{tlpi_url}}/{{tlpi_gz}}" dest=/tmp
+
+   - name: extract tlpi source
+     unarchive: src="/tmp/{{tlpi_gz}}" dest=/usr/src
+
+   - name: install linux headers, etc.
+     yum: name="{{item}}" state=present
+     with_items:
+       - kernel-devel
+       - kernel-headers
+
+   - name: clone coreutils repo
+     git: repo=git://git.savannah.gnu.org/coreutils.git 
+          dest=/usr/src/coreutils 
+          accept_hostkey=yes
+
+   # verify compiler installed
