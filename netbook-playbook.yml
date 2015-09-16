@@ -1,0 +1,20 @@
+ - hosts: netbook
+   sudo: yes
+#   vars: 
+
+   tasks:
+   - name: install important stuff
+# needs to be dnf if ansible 1.9 or later:
+     yum: name={{item}} state=present
+     with_items:
+       - pm-utils
+       - hdparm
+       - smartmontools
+       - vim-enhanced
+       - sysstat
+       - gcc
+   - name: enable stuff
+     service: name={{item}} state=started enabled=yes
+     with_items:
+       - fstrim.timer
+       - sysstat
