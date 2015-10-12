@@ -1,0 +1,35 @@
+---
+# Deploy ansible_dev branches
+
+# Install pip
+# state works in 2.0 only:
+#- easy_install: name=pip state=latest
+- easy_install: name=pip
+
+# yum dependencies:
+- yum: name={{item}} state=present
+  sudo: yes
+  with_items: 
+  - git
+  - gcc
+  - python-crypto 
+
+# Install virtualenv
+- pip: name=virtualenv 
+
+# Install required packages:
+- pip: name={{item}} virtualenv={{user_dir}}/virtualenv/ansible
+  with_items:
+   - paramiko 
+   - PyYAML 
+   - Jinja2 
+   - httplib2 
+   - six
+
+# ansible repo:
+- git: accept_hostkey=yes repo=git://github.com/ansible/ansible clone=yes dest=/home/james/python/ansible
+
+# forked module repos:
+- git: accept_hostkey=yes repo=git://github.com/jaymell/ansible-modules-core clone=yes dest=/home/james/python/ansible-modules-core
+- git: accept_hostkey=yes repo=git://github.com/jaymell/ansible-modules-extras clone=yes dest=/home/james/python/ansible-modules-extras
+
