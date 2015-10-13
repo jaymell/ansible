@@ -17,6 +17,7 @@
      with_items:
        - kernel-devel
        - kernel-headers
+       - glibc-headers
 
    - name: clone coreutils repo
      git: repo=git://git.savannah.gnu.org/coreutils.git 
