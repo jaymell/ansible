@@ -1,16 +1,4 @@
  - hosts: localhost
    sudo: yes
-   tasks:
-   # dependencies required to enable installation
-   # of vagrant-kvm:
-   - name: install important stuff
-     apt: name={{item}} state=present
-     with_items:
-       - vagrant
-       - zlib1g
-       - libvirt-bin
-       - libvirt-dev
-       - redir
-
-# also need to add putting user in 
-# kvm and libvirt groups
+   roles: 
+   - vagrant_kvm

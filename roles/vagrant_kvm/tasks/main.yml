@@ -1,0 +1,8 @@
+- include: packages-Debian.yml
+  when: "ansible_os_family == 'Debian'"
+
+#- include: packages-Redhat.yml
+#  when: "ansible_os_family == 'RedHat'"
+
+# need to add putting user in 
+# kvm and libvirt groups

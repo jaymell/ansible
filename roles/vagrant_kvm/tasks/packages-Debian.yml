@@ -1,0 +1,10 @@
+- name: install important stuff
+  apt: name={{item}} state=present
+  with_items:
+  - vagrant
+  - zlib1g
+  - libvirt-bin
+  - libvirt-dev
+  - redir
+
+
