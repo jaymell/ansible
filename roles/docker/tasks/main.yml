@@ -1,0 +1,12 @@
+- include: tasks-Debian.yml
+  when: "ansible_os_family == 'Debian'"
+
+- include: tasks-RedHat.yml
+  when: "ansible_os_family == 'RedHat'"
+
+- name: disable firewalld
+  service: name="firewalld" state=stopped enabled=no
+
+- name: start/enable service
+  service: name="docker" state=started enabled=yes
+
