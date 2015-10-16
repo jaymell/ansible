@@ -4,11 +4,13 @@
 - name: install important stuff
   yum: name={{item}} state=present
   with_items:
+  - gcc
   - ruby
-#  - rubygems
+  - ruby-devel
   - zlib
   - libvirt
   - libvirt-devel
+  - https://dl.bintray.com/mitchellh/vagrant/vagrant_1.7.4_x86_64.rpm
 
 #- name: install vagrant gem
 #  gem: name=vagrant state=present
