@@ -1,0 +1,6 @@
+ - hosts: localhost
+   sudo: yes
+   tasks: 
+     - name: install sudo
+       apt: name=sudo state=present
+ 
