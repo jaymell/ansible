@@ -1,0 +1,13 @@
+- name: install nodejs -- RedHat
+  yum: pkg={{item}} state=latest
+  with_items:
+    - nodejs
+    - npm
+  when: ansible_os_family == 'RedHat'
+
+- name: install nodejs -- Debian
+  apt: name={{item}} state=latest update_cache=yes
+  with_items:
+    - nodejs
+    - npm
+  when: ansible_os_family == 'Debian'
