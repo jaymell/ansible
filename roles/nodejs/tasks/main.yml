@@ -11,3 +11,17 @@
     - nodejs
     - npm
   when: ansible_os_family == 'Debian'
+
+# some module installs fail b/c debian uses 'nodejs'
+# instead of 'node' as binary name -- add a symlink
+# as a patch:
+- name: make /usr/bin/node symlink
+  file: path=/usr/bin/node state=link src=/usr/bin/nodejs
+  when: ansible_os_family == 'Debian'
+
+- name: install some basic tools globally
+  npm: name={{item}} global=yes state=latest
+  with_items:
+    - nodemon
+    - node-inspector
+
