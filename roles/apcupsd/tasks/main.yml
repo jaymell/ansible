@@ -1,5 +1,12 @@
+# note: apcupsd-cgi package puts files into
+# /usr/lib/cgi-bin, which may require
+# configuration changes for apache, etc.,
+# to get content served out:
 - name: install apcupsd -- Debian
   apt: name=apcupsd state=latest
+  with_items:
+  - apcupsd
+  - apcupsd-cgi
   when: ansible_os_family == 'Debian'
 
 - name: copy config file
