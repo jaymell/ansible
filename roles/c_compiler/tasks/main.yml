@@ -1,0 +1,5 @@
+- name: assign debian hosts to debian
+  include: "tasks-Debian.yml"
+  when: ansible_os_family=='Debian'
+
+

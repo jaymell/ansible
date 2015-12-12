@@ -1,0 +1,6 @@
+- name: install kernel source and headers
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+  - linux-source
+  - "linux-headers-{{kernel_version.stdout}}"
+

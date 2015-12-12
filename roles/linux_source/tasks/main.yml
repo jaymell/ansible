@@ -1,0 +1,8 @@
+- name: get kernel version
+  shell: /bin/uname -r
+  register: kernel_version
+
+- name: assign debian hosts to debian
+  include: "tasks-Debian.yml"
+  when: ansible_os_family=='Debian'
+
