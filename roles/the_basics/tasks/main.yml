@@ -1,0 +1,11 @@
+- name: assign debian hosts to debian
+  include: "tasks-Debian.yml"
+  when: ansible_os_family=='Debian'
+
+- name: copy vimrc
+  copy: >
+    src=.vimrc 
+    dest="/home/{{user}}/.vimrc"
+    mode=0664
+    owner="{{user}}"
+    group="{{user}}"

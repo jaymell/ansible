@@ -1,0 +1,6 @@
+- name: install kernel source and headers
+  yum: name={{item}} state=present 
+  with_items:
+  - kernel-devel
+  - kernel-headers
+  - kernel-doc

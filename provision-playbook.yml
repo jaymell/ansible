@@ -1,0 +1,4 @@
+- hosts: 192.168.1.5
+  sudo: yes
+  roles:
+  - the_basics
