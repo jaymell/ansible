@@ -1,23 +1,10 @@
-- name: install nodejs -- RedHat
-  yum: pkg={{item}} state=latest
-  with_items:
-    - nodejs
-    - npm
-  when: ansible_os_family == 'RedHat'
+- name: for debian hosts
+  include: "tasks-Debian.yml"
+  when: ansible_os_family=='Debian'
 
-- name: install nodejs -- Debian
-  apt: name={{item}} state=latest update_cache=yes
-  with_items:
-    - nodejs
-    - npm
-  when: ansible_os_family == 'Debian'
-
-# some module installs fail b/c debian uses 'nodejs'
-# instead of 'node' as binary name -- add a symlink
-# as a patch:
-- name: make /usr/bin/node symlink
-  file: path=/usr/bin/node state=link src=/usr/bin/nodejs
-  when: ansible_os_family == 'Debian'
+- name: for RedHat / CentOS hosts
+  include: "tasks-RedHat.yml"
+  when: ansible_os_family=='RedHat'
 
 - name: install some basic tools globally
   npm: name={{item}} global=yes state=latest

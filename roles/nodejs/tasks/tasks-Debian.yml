@@ -1,0 +1,11 @@
+- name: install nodejs -- Debian
+  apt: name={{item}} state=latest update_cache=yes
+  with_items:
+    - nodejs
+    - npm
+
+# some module installs fail b/c debian uses 'nodejs'
+# instead of 'node' as binary name -- add a symlink
+# as a patch:
+- name: make /usr/bin/node symlink
+  file: path=/usr/bin/node state=link src=/usr/bin/nodejs
