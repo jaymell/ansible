@@ -5,5 +5,5 @@ if [[ -z $1 ]]; then
 else
 	role=$1
 fi
-mkdir roles/$role
+mkdir -p roles/$role
 for i in files handlers tasks templates vars defaults; do mkdir roles/$role/$i; done
