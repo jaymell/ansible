@@ -3,9 +3,14 @@
   when: ansible_os_family=='Debian'
 
 - name: copy vimrc
+  become: no
   copy: >
     src=.vimrc 
     dest="/home/{{user}}/.vimrc"
     mode=0664
     owner="{{user}}"
     group="{{user}}"
+  tags: vim
+
+- name: ensure ssh running
+  service: name=ssh enabled=yes state=started

@@ -1,0 +1,8 @@
+---
+- name: deploy the_basics roles
+  hosts: localhost
+  become: yes
+  roles:
+  - the_basics
+
+
