@@ -15,8 +15,10 @@
    - Jinja2 
    - httplib2 
    - six
+   - pycrypto
 
 # ansible repo:
+- name: get latest ansible git repo
 - git: >
     accept_hostkey=yes 
     repo=git://github.com/ansible/ansible 

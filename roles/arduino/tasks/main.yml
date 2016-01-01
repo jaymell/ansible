@@ -1,0 +1,7 @@
+- name: for debian hosts
+  include: "tasks-Debian.yml"
+  when: ansible_os_family=='Debian'
+
+- name: for RedHat / CentOS hosts
+  include: "tasks-RedHat.yml"
+  when: ansible_os_family=='RedHat'

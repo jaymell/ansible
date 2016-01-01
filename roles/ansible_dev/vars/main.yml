@@ -1,1 +1,1 @@
-ansible_dir: "/opt/ansible"
+ansible_dir: "~/ansible"
