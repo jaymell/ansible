@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: debvisor
   become: yes
   roles:
     - arduino

@@ -5,3 +5,20 @@
 - name: for RedHat / CentOS hosts
   include: "tasks-RedHat.yml"
   when: ansible_os_family=='RedHat'
+
+- name: Download arduino ide
+  become: no
+  get_url: 
+    url: "http://download.arduino.org/IDE/1.7.8/arduino-1.7.8.org-linux64.tar.xz"
+    dest: "/tmp"
+  register: downloaded
+
+- name: create "{{arduino_dir}}", because unarchive module is stupid
+  become: no
+  file: path="{{arduino_dir}}" state=directory
+
+- name: extract ide
+  become: no
+  unarchive: 
+    src: "{{downloaded.dest}}"
+    dest: "{{arduino_dir}}"

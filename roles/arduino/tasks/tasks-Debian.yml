@@ -1,5 +1,15 @@
-- name: install nodejs -- Debian
+- name: install arduino dependencies -- debian
   apt: name={{item}} state=latest update_cache=yes
   with_items:
     - librxtx-java
     - arduino
+    - gcc-avr
+    - avrdude
+    - gcc
+    - avr-libc
+    - libantlr-java
+    - libecj-java
+    - libjna-java
+    - liboro-java
+    - openjdk-7-jdk
+

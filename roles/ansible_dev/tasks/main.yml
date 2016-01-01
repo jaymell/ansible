@@ -10,7 +10,6 @@
 # Install required packages:
 - pip: name={{item}} 
   with_items:
-   - paramiko 
    - PyYAML 
    - Jinja2 
    - httplib2 
@@ -19,7 +18,8 @@
 
 # ansible repo:
 - name: get latest ansible git repo
-- git: >
+  become: no
+  git: >
     accept_hostkey=yes 
     repo=git://github.com/ansible/ansible 
     dest="{{ansible_dir}}"
