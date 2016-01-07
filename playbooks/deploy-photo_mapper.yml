@@ -1,0 +1,74 @@
+---
+# example command line:
+#ansible-playbook -i playbooks/hosts playbooks/deploy-photo_mapper.yml  --private-key=~/.ssh/photo_mapper.pem -u root
+- name: provision SGs and instance
+  hosts: localhost
+  vars:
+    region: us-west-2
+    instance_type: t2.micro
+    key_name: photo_mapper
+    # adi-debian-jessie-base-20151221-1
+    image: ami-e0687681
+    count: 1
+    tags: { type: mongodb }
+  tasks:
+  - name: create ssh security group
+    ec2_group:
+     name: ssh
+     region: "{{region}}"
+     description: allow inbound ssh
+     rules:
+     - proto: tcp
+       from_port: 22
+       to_port: 22
+       cidr_ip: 0.0.0.0/0
+  - name: create mongodb security group
+    ec2_group:
+     name: mongodb
+     region: "{{region}}"
+     description: allow inbound mongodb connectivity
+     rules:
+     - proto: tcp
+       from_port: 27017
+       to_port: 27017
+       # need a better solution here:
+       cidr_ip: 0.0.0.0/0
+  - name: create outbound security group
+    ec2_group:
+     name: outbound
+     region: "{{region}}"
+     description: allow outbound connections
+     rules_egress:
+     - proto: all
+       cidr_ip: 0.0.0.0/0
+  - name: create instance
+    ec2:
+     image: "{{image}}"
+     region: "{{region}}"
+     instance_type: "{{instance_type}}"
+     instance_tags: "{{tags}}"
+     key_name: "{{key_name}}"
+     count_tag: "{{tags}}"
+     exact_count: "{{count}}"
+     group: [ssh, outbound, mongodb]
+     wait: yes
+    register: ec2
+  - name: add instances to inventory / mongodb_aws group
+    add_host:
+     hostname: "{{item.public_ip}}"
+     groups: mongodb_aws
+    with_items: ec2.tagged_instances
+  - name: wait for instance accessible
+    wait_for:
+     host: "{{item.public_ip}}"
+     port: 22
+     search_regex: "OpenSSH"
+    with_items: ec2.tagged_instances
+
+- name: mongodb on ec2.tagged_instances
+  vars:
+    mongodb_bind_address: 0.0.0.0
+  hosts: mongodb_aws
+  become: yes
+  roles:
+  - mongodb
