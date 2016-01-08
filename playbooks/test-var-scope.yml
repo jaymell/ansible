@@ -1,0 +1,22 @@
+---
+- name: initial variable set
+  hosts: localhost
+  vars:
+    animal: 'monkey'
+  tasks: 
+  # you can see value of animal here no problem
+  - debug: var=animal
+  - set_fact: 
+     fruit: 'apple'
+  - shell: echo turducken
+    register: food
+
+- name: second play, what effect does this have on variables
+  hosts: localhost
+  tasks:
+  # but animal is undefined here
+  - debug: var=bill
+  # fruit is defined here, though, because facts last for entire playbook
+  - debug: var=fruit
+  # food is defined here because registered variables work for entire playbook
+  - debug: var=food
