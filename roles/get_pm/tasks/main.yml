@@ -1,0 +1,14 @@
+---
+- name: ensure "{{app_dir}}" exists and is writeable
+  file:
+   path: "{{app_dir}}"
+   state: directory
+   owner: "{{user}}"
+   group: "{{user}}"
+   mode: 0770
+
+- name: get repo
+  become: no
+  git:
+   repo: https://github.com/jaymell/photo_mapper
+   dest: "{{app_dir}}"

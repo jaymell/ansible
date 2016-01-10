@@ -1,6 +1,6 @@
 ---
 # example command line:
-#ansible-playbook -i playbooks/hosts playbooks/deploy-photo_mapper.yml  --private-key=~/.ssh/photo_mapper.pem -u root
+#ansible-playbook -i playbooks/hosts playbooks/deploy-photo_mapper.yml  --private-key=~/.ssh/photo_mapper.pem -u admin
 - name: provision SGs and instance
   hosts: localhost
   vars:
@@ -63,29 +63,29 @@
        to_port: 27017
        # should be smarter about this:
        cidr_ip: 0.0.0.0/0
-  - name: create mongodb instance
-    ec2:
-     image: "{{image}}"
-     region: "{{region}}"
-     instance_type: "{{instance_type}}"
-     instance_tags: { type: mongodb, Name: pm_mongodb }
-     key_name: "{{key_name}}"
-     count_tag: { type: mongodb }
-     exact_count: "{{mongodb_count}}"
-     group: [ssh, outbound, mongodb]
-     wait: yes
-    register: mongodb_ct
-  - name: add instance to inventory / mongodb_aws group
-    add_host:
-     hostname: "{{item.public_ip}}"
-     groups: mongodb_aws
-    with_items: mongodb_ct.tagged_instances
-  - name: wait for instance accessible
-    wait_for:
-     host: "{{item.public_ip}}"
-     port: 22
-     search_regex: "OpenSSH"
-    with_items: mongodb_ct.tagged_instances
+#  - name: create mongodb instance
+#    ec2:
+#     image: "{{image}}"
+#     region: "{{region}}"
+#     instance_type: "{{instance_type}}"
+#     instance_tags: { type: mongodb, Name: pm_mongodb }
+#     key_name: "{{key_name}}"
+#     count_tag: { type: mongodb }
+#     exact_count: "{{mongodb_count}}"
+#     group: [ssh, outbound, mongodb]
+#     wait: yes
+#    register: mongodb_ct
+#  - name: add instance to inventory / mongodb_aws group
+#    add_host:
+#     hostname: "{{item.public_ip}}"
+#     groups: mongodb_aws
+#    with_items: mongodb_ct.tagged_instances
+#  - name: wait for instance accessible
+#    wait_for:
+#     host: "{{item.public_ip}}"
+#     port: 22
+#     search_regex: "OpenSSH"
+#    with_items: mongodb_ct.tagged_instances
   - name: add instance to inventory / docker_aws group
     add_host:
      hostname: "{{item.public_ip}}"
@@ -98,18 +98,42 @@
      search_regex: "OpenSSH"
     with_items: docker_ct.tagged_instances
 
-- name: mongodb on mongodb_ct.tagged_instances
-  vars:
-    mongodb_bind_address: 0.0.0.0
-  hosts: mongodb_aws
-  remote_user: admin
-  become: yes
-  roles:
-  - mongodb
+#- name: mongodb on mongodb_ct.tagged_instances
+#  vars:
+#    mongodb_bind_address: 0.0.0.0
+#  hosts: mongodb_aws
+#  remote_user: admin
+#  become: yes
+#  roles:
+#  - mongodb
 
 - name: docker on docker_ct.tagged_instances
   hosts: docker_aws
+  vars:
+   dir: /opt/photo_mapper
   remote_user: admin
   become: yes
   roles:
   - docker 
+  - { role: get_pm, app_dir: "{{dir}}" }
+  tasks:
+  - name: get docker image on remote host
+    copy: 
+     src: /home/james/pm_image
+     dest: /tmp/pm_image
+  - name: import docker image file
+    command: docker load -i /tmp/pm_image
+  - name: install pip
+    easy_install: name=pip 
+  - name: install docker-py
+    pip: name=docker-py 
+  - name: run docker on hosts
+    docker: 
+     name: pm
+     image: photo_mapper
+     ports:
+     - "80:80"
+     state: started
+     volumes: 
+     - '{{app_dir}}:/app'
+
