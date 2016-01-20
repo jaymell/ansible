@@ -115,7 +115,6 @@
   become: yes
   roles:
   - docker 
-  - { role: get_pm, app_dir: "{{dir}}" }
   tasks:
   - name: get docker image on remote host
     copy: 
@@ -134,6 +133,6 @@
      ports:
      - "80:80"
      state: started
-     volumes: 
-     - '{{app_dir}}:/app'
+#     volumes: 
+#     - '{{app_dir}}:/app'
 
