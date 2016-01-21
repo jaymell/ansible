@@ -1,11 +1,11 @@
 ---
 # sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
 - name: add mongo repo key
-  apt_key: keyserver=keyserver.ubuntu.com id=7F0CEB10 state=present 
+  apt_key: keyserver=keyserver.ubuntu.com id="{{ubuntu_mongo_key}}" state=present 
 
 # echo "deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
 - name: add repo
-  apt_repository: repo="deb http://repo.mongodb.org/apt/debian wheezy/mongodb-org/3.0 main" state=present
+  apt_repository: repo="{{ubuntu_mongo_repo}}" state=present
 
 # sudo apt-get install -y mongodb-org
 - name: install mongodb
