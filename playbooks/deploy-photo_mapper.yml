@@ -1,6 +1,6 @@
 ---
 # example command line:
-#ansible-playbook -i playbooks/hosts playbooks/deploy-photo_mapper.yml  --private-key=~/.ssh/photo_mapper.pem -u admin
+#ansible-playbook -i playbooks/hosts playbooks/deploy-photo_mapper.yml  --private-key=~/.ssh/photo_mapper.pem 
 - name: provision SGs and instance
   hosts: localhost
   vars:
@@ -54,6 +54,7 @@
      rules_egress:
      - proto: all
        cidr_ip: 0.0.0.0/0
+
   - name: create docker instance
     ec2:
      image: "{{docker_image}}"
@@ -65,7 +66,9 @@
      count_tag: { type: pm_docker }
      exact_count: "{{docker_count}}"
      group: [ ssh, outbound, http ]
+     wait: yes
     register: docker_ct
+
   - name: create mongodb instance
     ec2:
      image: "{{mongodb_image}}"
@@ -77,18 +80,13 @@
      count_tag: { type: pm_mongodb }
      exact_count: "{{mongodb_count}}"
      group: [ssh, outbound, mongodb]
+     wait: yes
     register: mongodb_ct
+
   - name: add instance to inventory / mongodb_aws group
     add_host:
      hostname: "{{item.public_ip}}"
      groups: mongodb_aws
-    with_items: mongodb_ct.tagged_instances
-
-  - name: wait for instance accessible
-    wait_for:
-     host: "{{item.public_ip}}"
-     port: 22
-     search_regex: "OpenSSH"
     with_items: mongodb_ct.tagged_instances
 
   - name: add instance to inventory / docker_aws group
@@ -96,12 +94,21 @@
      hostname: "{{item.public_ip}}"
      groups: docker_aws
     with_items: docker_ct.tagged_instances
-  - name: wait for instance accessible
+
+  - name: wait for mongo instance accessible
+    wait_for:
+     host: "{{item.public_ip}}"
+     port: 22
+     search_regex: "OpenSSH"
+    with_items: mongodb_ct.tagged_instances
+
+  - name: wait for docker instance accessible
     wait_for:
      host: "{{item.public_ip}}"
      port: 22
      search_regex: "OpenSSH"
     with_items: docker_ct.tagged_instances
+
 
 # mongo provision play
 - name: mongodb on mongodb_ct.tagged_instances
