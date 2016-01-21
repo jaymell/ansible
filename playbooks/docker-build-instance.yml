@@ -1,0 +1,77 @@
+---
+# for deploying an instance to aws that will be used for building docker
+# images
+- name: provision SGs and instance
+  hosts: localhost
+  vars:
+    region: us-east-1
+    instance_type: t2.micro
+    instance_profile: docker_builder
+    key_name: photo_mapper
+    # ubuntu
+    docker_image: ami-fce3c696
+    docker_count: 1
+  tasks:
+  - name: create "{{instance_profile}}" role
+    iam:
+     iam_type: role
+     name: "{{instance_profile}}"
+     state: present
+  - name: associate registry access policy with role
+    iam_policy: 
+     iam_type: role
+     iam_name: "{{instance_profile}}"
+     policy_name: "AmazonEC2ContainerRegistryFullAccess"
+     state: present
+     policy_document: files/docker_builder_policy.json
+  - name: create ssh security group
+    ec2_group:
+     name: ssh
+     region: "{{region}}"
+     description: allow inbound ssh
+     rules:
+     - proto: tcp
+       from_port: 22
+       to_port: 22
+       cidr_ip: 0.0.0.0/0
+  - name: create outbound security group
+    ec2_group:
+     name: outbound
+     region: "{{region}}"
+     description: allow outbound connections
+     rules_egress:
+     - proto: all
+       cidr_ip: 0.0.0.0/0
+  - name: create docker instance
+    ec2:
+     image: "{{docker_image}}"
+     region: "{{region}}"
+     instance_type: "{{instance_type}}"
+     instance_profile_name: "{{instance_profile}}"
+     instance_tags: { type: docker_builder }
+     key_name: "{{key_name}}"
+     count_tag: { type: docker_builder }
+     exact_count: "{{docker_count}}"
+     group: [ ssh, outbound ]
+     wait: yes
+    register: docker_ct
+  - name: add instance to inventory / docker_aws group
+    add_host:
+     hostname: "{{item.public_ip}}"
+     groups: docker_aws
+    with_items: docker_ct.tagged_instances
+  - name: wait for docker instance accessible
+    wait_for:
+     host: "{{item.public_ip}}"
+     port: 22
+     search_regex: "OpenSSH"
+    with_items: docker_ct.tagged_instances
+
+- name: docker on docker_ct.tagged_instances
+  hosts: docker_aws
+  vars:
+  remote_user: ubuntu
+  become: yes
+  roles:
+  - docker 
+

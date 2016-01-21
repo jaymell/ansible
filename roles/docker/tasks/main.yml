@@ -1,8 +1,11 @@
 - include: tasks-Debian.yml
-  when: "ansible_os_family == 'Debian'"
+  when: "ansible_distribution == 'Debian'"
+
+- include: tasks-Ubuntu.yml 
+  when: "ansible_distribution == 'Ubuntu'"
 
 - include: tasks-RedHat.yml
-  when: "ansible_os_family == 'RedHat'"
+  when: "ansible_distribution == 'RedHat'"
 
 - name: disable firewalld
   service: name="firewalld" state=stopped enabled=no
