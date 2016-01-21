@@ -3,7 +3,10 @@
   hosts: localhost
   vars:
     animal: 'monkey'
+    testing: '123'
   tasks: 
+  # if you override this on command line, it won't be what specified above
+  - debug: var=testing
   # you can see value of animal here no problem
   - debug: var=animal
   - set_fact: 
