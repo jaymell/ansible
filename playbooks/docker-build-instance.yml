@@ -7,7 +7,7 @@
     region: us-east-1
     instance_type: t2.micro
     instance_profile: docker_builder
-    key_name: photo_mapper
+    key_name: docker_builder
     # ubuntu
     docker_image: ami-fce3c696
     docker_count: 1
@@ -74,4 +74,7 @@
   become: yes
   roles:
   - docker 
+  tasks:
+  - name: install aws cli
+    apt: name=awscli state=present update_cache=yes
 

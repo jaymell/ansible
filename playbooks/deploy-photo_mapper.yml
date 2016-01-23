@@ -69,25 +69,25 @@
      wait: yes
     register: docker_ct
 
-  - name: create mongodb instance
-    ec2:
-     image: "{{mongodb_image}}"
-     region: "{{region}}"
-     instance_type: "{{instance_type}}"
-     instance_profile_name: "{{instance_profile}}"
-     instance_tags: { type: pm_mongodb }
-     key_name: "{{key_name}}"
-     count_tag: { type: pm_mongodb }
-     exact_count: "{{mongodb_count}}"
-     group: [ssh, outbound, mongodb]
-     wait: yes
-    register: mongodb_ct
-
-  - name: add instance to inventory / mongodb_aws group
-    add_host:
-     hostname: "{{item.public_ip}}"
-     groups: mongodb_aws
-    with_items: mongodb_ct.tagged_instances
+#  - name: create mongodb instance
+#    ec2:
+#     image: "{{mongodb_image}}"
+#     region: "{{region}}"
+#     instance_type: "{{instance_type}}"
+#     instance_profile_name: "{{instance_profile}}"
+#     instance_tags: { type: pm_mongodb }
+#     key_name: "{{key_name}}"
+#     count_tag: { type: pm_mongodb }
+#     exact_count: "{{mongodb_count}}"
+#     group: [ssh, outbound, mongodb]
+#     wait: yes
+#    register: mongodb_ct
+#
+#  - name: add instance to inventory / mongodb_aws group
+#    add_host:
+#     hostname: "{{item.public_ip}}"
+#     groups: mongodb_aws
+#    with_items: mongodb_ct.tagged_instances
 
   - name: add instance to inventory / docker_aws group
     add_host:
@@ -95,12 +95,12 @@
      groups: docker_aws
     with_items: docker_ct.tagged_instances
 
-  - name: wait for mongo instance accessible
-    wait_for:
-     host: "{{item.public_ip}}"
-     port: 22
-     search_regex: "OpenSSH"
-    with_items: mongodb_ct.tagged_instances
+#  - name: wait for mongo instance accessible
+#    wait_for:
+#     host: "{{item.public_ip}}"
+#     port: 22
+#     search_regex: "OpenSSH"
+#    with_items: mongodb_ct.tagged_instances
 
   - name: wait for docker instance accessible
     wait_for:
@@ -119,34 +119,3 @@
   become: yes
   roles:
   - mongodb
-
-# docker provision play
-#- name: docker on docker_ct.tagged_instances
-#  hosts: docker_aws
-#  vars:
-#  remote_user: admin
-#  become: yes
-#  roles:
-#  - docker 
-#  tasks:
-#  - name: get docker image on remote host
-#    docker: 
-#     src: /home/james/pm_image
-#     dest: /tmp/pm_image
-#  - name: import docker image file
-#    command: docker load -i /tmp/pm_image
-
-#  - name: install pip
-#    easy_install: name=pip 
-#  - name: install docker-py
-#    pip: name=docker-py 
-#  - name: run docker on hosts
-#    docker: 
-#     name: pm
-#     image: photo_mapper
-#     ports:
-#     - "80:80"
-#     state: started
-#     volumes: 
-#     - '{{app_dir}}:/app'
-
