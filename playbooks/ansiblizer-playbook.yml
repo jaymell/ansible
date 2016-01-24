@@ -30,12 +30,30 @@
      - proto: all
        cidr_ip: 0.0.0.0/0
 
+  - name: create ansible iam role
+    iam:
+     iam_type: role
+     name: ansible
+     state: present
+
+  - name: attach policies to ansible iam role
+    iam_policy:
+     iam_type: role
+     iam_name: ansible
+     policy_name: "ansible_{{item}}"
+     state: present 
+     policy_document: "files/{{item}}.json"
+    with_items:
+    - admin
+    - s3ReadOnly
+
   - name: create instance
     ec2:
      image: "{{image}}"
      region: "{{region}}"
      instance_type: "{{instance_type}}"
      instance_tags: "{{tags}}"
+     instance_profile_name: ansible
      key_name: "{{key_name}}"
      count_tag: "{{tags}}"
      exact_count: "{{count}}"
@@ -59,5 +77,6 @@
 - name: run ansible on all hosts in group
   become: yes
   hosts: ansiblizer
+  remote_user: ubuntu
   roles:
   - ansiblizer

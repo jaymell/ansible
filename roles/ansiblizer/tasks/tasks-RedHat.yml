@@ -2,6 +2,6 @@
   yum: name={{item}} state=present
   with_items:
   - python-pip
-#  - git
-#  - python-devel
-#  - gcc
+  - python-devel
+  - gcc
+  - git

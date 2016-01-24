@@ -12,6 +12,12 @@
   with_items: 
   - ansible
   - boto
+  - PyYAML
+  - Jinja2
+  - httplib2
+  - six
+  - pycrypto
+
 
 - name: clone/pull stuff
   become: no
@@ -24,4 +30,5 @@
   - { 'repo': '{{aws_repo}}', 'dir': '{{aws_dir}}' }
 
 - name: get keys for ssh'ing from s3
-  command: {{aws_dir}}/get_s3_creds.py  
+  become: no
+  command: "{{aws_dir}}/get_s3_creds.py"
