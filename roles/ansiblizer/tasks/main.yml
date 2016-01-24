@@ -8,7 +8,7 @@
   when: ansible_os_family=='RedHat'
 
 - name: install ansible
-  pip: name="{{item}}" 
+  pip: name="{{item}}" state=latest
   with_items: 
   - ansible
   - boto
@@ -17,7 +17,7 @@
   - httplib2
   - six
   - pycrypto
-
+  - markupsafe
 
 - name: clone/pull stuff
   become: no
