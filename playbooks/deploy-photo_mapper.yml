@@ -10,6 +10,7 @@
     key_name: photo_mapper
     # ubuntu
     mongodb_image: ami-fce3c696
+    mongodb_ip: 172.31.51.90
     # latest aws ecs-optimized for docker hosts
     docker_image: ami-2b3b6041
     mongodb_count: 1
@@ -78,6 +79,8 @@
      instance_type: "{{instance_type}}"
      instance_profile_name: "{{instance_profile}}"
      instance_tags: { type: pm_mongodb }
+     assign_public_ip: no
+     private_ip: "{{mongodb_ip}}"
      key_name: "{{key_name}}"
      count_tag: { type: pm_mongodb }
      exact_count: "{{mongodb_count}}"
