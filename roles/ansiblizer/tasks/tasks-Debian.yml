@@ -1,0 +1,6 @@
+- name: install apt dependencies
+  apt: name={{item}} state=present update_cache=yes
+  with_items:
+  - python-pip
+#  - git
+#  - python-dev

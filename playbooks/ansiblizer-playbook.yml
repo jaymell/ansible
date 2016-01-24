@@ -1,0 +1,63 @@
+---
+- name: provision box from which ansible will be run
+  hosts: localhost
+  vars:
+    region: us-east-1
+    instance_type: t2.micro
+    key_name: ansible
+    image: ami-fce3c696
+    count: 1
+    tags: { type: ansible }
+  tasks:
+
+  - name: create ssh security group
+    ec2_group:
+     name: ssh
+     region: "{{region}}"
+     description: allow inbound ssh
+     rules:
+     - proto: tcp
+       from_port: 22
+       to_port: 22
+       cidr_ip: 0.0.0.0/0
+
+  - name: create outbound security group
+    ec2_group:
+     name: outbound
+     region: "{{region}}"
+     description: allow outbound connections
+     rules_egress: 
+     - proto: all
+       cidr_ip: 0.0.0.0/0
+
+  - name: create instance
+    ec2:
+     image: "{{image}}"
+     region: "{{region}}"
+     instance_type: "{{instance_type}}"
+     instance_tags: "{{tags}}"
+     key_name: "{{key_name}}"
+     count_tag: "{{tags}}"
+     exact_count: "{{count}}"
+     group: [ssh, outbound]
+     wait: yes
+    register: ec2
+
+  - name: add instances to inventory / ansibilizer group
+    add_host:
+     hostname: "{{item.public_dns_name}}"
+     groups: ansiblizer
+    with_items: ec2.tagged_instances
+
+  - name: wait for instance accessible
+    wait_for: 
+     host: "{{item.public_dns_name}}"
+     port: 22
+     search_regex: "OpenSSH"
+    with_items: ec2.tagged_instances
+
+- name: run ansible on all hosts in group
+  become: yes
+  hosts: ansiblizer
+  roles:
+  - ansiblizer

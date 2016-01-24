@@ -1,0 +1,27 @@
+---
+- name: for debian hosts
+  include: "tasks-Debian.yml"
+  when: ansible_os_family=='Debian'
+
+- name: for RedHat / CentOS hosts
+  include: "tasks-RedHat.yml"
+  when: ansible_os_family=='RedHat'
+
+- name: install ansible
+  pip: name="{{item}}" 
+  with_items: 
+  - ansible
+  - boto
+
+- name: clone/pull stuff
+  become: no
+  git: 
+    accept_hostkey: yes
+    repo: "{{item.repo}}"
+    dest: "{{item.dir}}"
+  with_items:
+  - { 'repo': '{{ansible_repo}}', 'dir': '{{ansible_repo_dir}}' }
+  - { 'repo': '{{aws_repo}}', 'dir': '{{aws_dir}}' }
+
+- name: get keys for ssh'ing from s3
+  command: {{aws_dir}}/get_s3_creds.py  

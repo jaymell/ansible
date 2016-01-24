@@ -13,7 +13,7 @@
     # latest aws ecs-optimized for docker hosts
     docker_image: ami-2b3b6041
     mongodb_count: 1
-    docker_count: 3
+    docker_count: 1
   tasks:
   - name: create ssh security group
     ec2_group:
@@ -44,7 +44,9 @@
      - proto: tcp
        from_port: 27017
        to_port: 27017
-       # should be smarter about this:
+       # should be smarter about this -- no
+       # no reason that ANYTHING outside of vpc
+       # needs to access this:
        cidr_ip: 0.0.0.0/0
   - name: create outbound security group
     ec2_group:
@@ -69,46 +71,45 @@
      wait: yes
     register: docker_ct
 
-#  - name: create mongodb instance
-#    ec2:
-#     image: "{{mongodb_image}}"
-#     region: "{{region}}"
-#     instance_type: "{{instance_type}}"
-#     instance_profile_name: "{{instance_profile}}"
-#     instance_tags: { type: pm_mongodb }
-#     key_name: "{{key_name}}"
-#     count_tag: { type: pm_mongodb }
-#     exact_count: "{{mongodb_count}}"
-#     group: [ssh, outbound, mongodb]
-#     wait: yes
-#    register: mongodb_ct
-#
-#  - name: add instance to inventory / mongodb_aws group
-#    add_host:
-#     hostname: "{{item.public_ip}}"
-#     groups: mongodb_aws
-#    with_items: mongodb_ct.tagged_instances
+  - name: create mongodb instance
+    ec2:
+     image: "{{mongodb_image}}"
+     region: "{{region}}"
+     instance_type: "{{instance_type}}"
+     instance_profile_name: "{{instance_profile}}"
+     instance_tags: { type: pm_mongodb }
+     key_name: "{{key_name}}"
+     count_tag: { type: pm_mongodb }
+     exact_count: "{{mongodb_count}}"
+     group: [ssh, outbound, mongodb]
+     wait: yes
+    register: mongodb_ct
+
+  - name: add instance to inventory / mongodb_aws group
+    add_host:
+     hostname: "{{item.private_ip}}"
+     groups: mongodb_aws
+    with_items: mongodb_ct.tagged_instances
 
   - name: add instance to inventory / docker_aws group
     add_host:
-     hostname: "{{item.public_ip}}"
+     hostname: "{{item.private_ip}}"
      groups: docker_aws
     with_items: docker_ct.tagged_instances
 
-#  - name: wait for mongo instance accessible
-#    wait_for:
-#     host: "{{item.public_ip}}"
-#     port: 22
-#     search_regex: "OpenSSH"
-#    with_items: mongodb_ct.tagged_instances
+  - name: wait for mongo instance accessible
+    wait_for:
+     host: "{{item.private_ip}}"
+     port: 22
+     search_regex: "OpenSSH"
+    with_items: mongodb_ct.tagged_instances
 
   - name: wait for docker instance accessible
     wait_for:
-     host: "{{item.public_ip}}"
+     host: "{{item.private_ip}}"
      port: 22
      search_regex: "OpenSSH"
     with_items: docker_ct.tagged_instances
-
 
 # mongo provision play
 - name: mongodb on mongodb_ct.tagged_instances

@@ -1,0 +1,4 @@
+ansible_repo: https://github.com/jaymell/ansible-misc
+ansible_repo_dir: ~/ansible
+aws_repo: https://github.com/jaymell/awsMisc
+aws_dir: ~/aws

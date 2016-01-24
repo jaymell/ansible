@@ -75,6 +75,9 @@
   roles:
   - docker 
   tasks:
-  - name: install aws cli
-    apt: name=awscli state=present update_cache=yes
+  # THIS BELONGS IN A ROLE!
+  - name: install pip
+    apt: name=python-pip state=present update_cache=yes
+  - name: install awscli
+    pip: name=awscli
 
