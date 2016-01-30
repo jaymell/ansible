@@ -70,6 +70,8 @@
 - name: docker on docker_ct.tagged_instances
   hosts: docker_aws
   vars:
+    docker_repo: http://github.com/jaymell/docker  
+    docker_repo_dest: ~/docker
   remote_user: ubuntu
   become: yes
   roles:
@@ -80,4 +82,13 @@
     apt: name=python-pip state=present update_cache=yes
   - name: install awscli
     pip: name=awscli
+
+  - name: clone/pull stuff
+    become: no
+    git:
+      accept_hostkey: yes
+      repo: "{{item.repo}}"
+      dest: "{{item.dir}}"
+    with_items:
+    - { 'repo': '{{docker_repo}}', 'dir': '{{docker_repo_dest}}' }
 
