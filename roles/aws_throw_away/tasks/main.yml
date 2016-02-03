@@ -13,7 +13,7 @@
    count_tag: "{{tag}}"
    exact_count: "{{count}}"
    # group: "{{groups}}"
-   group: [ "ssh", "outbound" ]
+   group: "{{security_groups}}"
    wait: yes
   register: throw_away
 

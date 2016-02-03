@@ -6,4 +6,4 @@ key_name: throw_away
 image_id: ami-fce3c696
 tag: { throw_away: True, Name: throw_away}
 count: 1
-groups: ["ssh", "outbound"]
+security_groups: ["ssh", "outbound"]
