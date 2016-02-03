@@ -1,0 +1,32 @@
+---
+# 	vars:
+# int count, dict tag, str instance_type, list groups,
+# str image_id, str key_name, str region... should be set prior,
+# str inventory_group
+- name: create throw_away instance
+  ec2:
+   image: "{{image_id}}"
+   region: "{{region}}"
+   instance_type: "{{instance_type}}"
+   instance_tags: "{{tag}}"
+   key_name: "{{key_name}}"
+   count_tag: "{{tag}}"
+   exact_count: "{{count}}"
+   # group: "{{groups}}"
+   group: [ "ssh", "outbound" ]
+   wait: yes
+  register: throw_away
+
+- name: add instance(s) to inventory 
+  add_host:
+   hostname: "{{item.public_ip}}"
+   groups: "{{inventory_group}}"
+  with_items: throw_away.tagged_instances
+
+- name: wait for instance(s) accessible
+  wait_for:
+   host: "{{item.public_ip}}"
+   port: 22
+   search_regex: "OpenSSH"
+  with_items: throw_away.tagged_instances
+

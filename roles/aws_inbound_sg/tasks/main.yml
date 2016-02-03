@@ -1,0 +1,11 @@
+---
+- name: ensure inbound port sg exists
+  ec2_group:
+   name: "{{sg_name}}"
+   region: "{{region}}"
+   description: allow inbound "{{sg_name}}"
+   rules:
+   - proto: "{{proto}}"
+     from_port: "{{port_number}}"
+     to_port: "{{port_number}}"
+     cidr_ip: "{{source_ip_range}}"

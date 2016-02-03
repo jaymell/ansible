@@ -1,15 +1,37 @@
 ---
-- hosts: localhost
+- name: provision throwaway
+  hosts: localhost
+  vars:
+    region: us-east-1
+  roles:
+  - { role: aws_inbound_sg, port_number: 22, sg_name: 'ssh' }
+  - { role: aws_outbound_sg } # default unrestricted
+  - { role: aws_throw_away, image_id: ami-60b6c60a }
+
+- name: set up environment for compiling rsyslog
+  hosts: throw_away
   become: yes
+  remote_user: ec2-user
   tasks:
+  - yum: name=libselinux-python state=present
+  - name: disable selinux
+    selinux: state=disabled
+    ignore_errors: true
   - name: remove stock rsyslog
-    yum: name=rsyslog state=absent
+    yum: 
+      name: rsyslog 
+      state: absent
   - name: add rsyslog repo
-    yumrepo:     
-      baseurl: http://rpms.adiscon.com/v8-stable/epel-6/$basearch
-      gpgkey: http://rpms.adiscon.com/RPM-GPG-KEY-Adiscon
-      protect: yes
-      state: present
+    copy:
+      src: files/rsyslog.repo
+      dest: /etc/yum.repos.d/rsyslog.repo
+#    yumrepo:
+#      baseurl: http://rpms.adiscon.com/v8-stable/epel-6/$basearch
+#      gpgkey: http://rpms.adiscon.com/RPM-GPG-KEY-Adiscon
+#      protect: yes
+#      state: present
+  - name: install epel repo
+    yum: name=epel-release state=present
   - name: install packages
     yum: name="{{item}}" state=present enablerepo=epel
     ### this list can be cleaned up big time: ####
@@ -44,4 +66,11 @@
       repo: https://github.com/rsyslog/rsyslog.git
       dest: ~/rsyslog
       version: v8-stable
+      force: yes
+
+  - name: test rsyslog config
+    copy: content='module(load="omhiredis")\n' dest=/etc/rsyslog.conf
+
+  - name: put syntax for check in file
+    copy: content="/usr/local/sbin/rsyslogd -N1\n" dest=~/check-config-syntax
 

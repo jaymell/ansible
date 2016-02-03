@@ -1,0 +1,14 @@
+---
+# vars:
+# str sg_name (eg 'ssh'), str proto (default all|tcp|udp), 
+# int port (optional), str source_ip_range (default 0.0.0.0/0)
+# region... should be set prior
+- name: create outbound security group
+  ec2_group:
+   name: outbound
+   region: "{{region}}"
+   description: allow outbound connections
+   rules_egress:
+   - proto: "{{proto}}"
+     cidr_ip: "{{outbound_ip_range}}"
+

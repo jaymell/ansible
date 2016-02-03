@@ -1,0 +1,3 @@
+---
+proto: all
+outbound_ip_range: 0.0.0.0/0
