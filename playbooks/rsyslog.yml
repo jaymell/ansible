@@ -60,6 +60,8 @@
     - libdbi-dbd-mysql 
     - libdbi-devel 
     - net-snmp-devel
+    - redis
+    - libfastjson-devel
   - name: clone rsyslog git repo
     become: no
     git: 
@@ -68,9 +70,24 @@
       version: v8-stable
       force: yes
 
+  - name: clone my fork
+    become: no
+    git: 
+      repo: https://github.com/jaymell/rsyslog.git
+      dest: ~/jsyslog
+      force: yes
+
+  - name: start redis
+    service: name=redis state=started
+
   - name: test rsyslog config
-    copy: content='module(load="omhiredis")\n' dest=/etc/rsyslog.conf
-
+    copy: src="{{item.name}}" dest="{{item.dest}}" mode=0644
+    with_items:
+    - { name: files/rsyslog.conf, dest: /etc/rsyslog.conf }
+    - { name: files/22-redis.conf, dest: /etc/rsyslog.d/22-redis.conf }
+    
   - name: put syntax for check in file
-    copy: content="/usr/local/sbin/rsyslogd -N1\n" dest=~/check-config-syntax
-
+    become: no
+    copy: content="{{item}}" dest=~/check-config-syntax
+    with_items: "autoreconf -fiv\n./configure --enable-omhiredis\nmake\nsudo make install\n/usr/local/sbin/rsyslogd -N1\n\n"
+ 
