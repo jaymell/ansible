@@ -15,7 +15,7 @@
     docker_image: ami-2b3b6041
     mongodb_count: 1
     docker_count: 3
-    ecs_cluster: pm_docker
+    ecs_cluster: pm
   tasks:
   - name: create ssh security group
     ec2_group:
