@@ -15,6 +15,7 @@
     docker_image: ami-2b3b6041
     mongodb_count: 1
     docker_count: 3
+    ecs_cluster: pm
   tasks:
   - name: create ssh security group
     ec2_group:
@@ -58,27 +59,13 @@
      - proto: all
        cidr_ip: 0.0.0.0/0
 
-  - name: create docker instance
-    ec2:
-     image: "{{docker_image}}"
-     region: "{{region}}"
-     instance_type: "{{instance_type}}"
-     instance_profile_name: "{{instance_profile}}"
-     instance_tags: { type: pm_docker }
-     key_name: "{{key_name}}"
-     count_tag: { type: pm_docker }
-     exact_count: "{{docker_count}}"
-     group: [ ssh, outbound, http ]
-     wait: yes
-    register: docker_ct
-
   - name: create mongodb instance
     ec2:
      image: "{{mongodb_image}}"
      region: "{{region}}"
      instance_type: "{{instance_type}}"
      instance_profile_name: "{{instance_profile}}"
-     instance_tags: { type: pm_mongodb }
+     instance_tags: { type: pm_mongodb, Name: pm_mongodb }
      assign_public_ip: no
      private_ip: "{{mongodb_ip}}"
      key_name: "{{key_name}}"
@@ -94,25 +81,39 @@
      groups: mongodb_aws
     with_items: mongodb_ct.tagged_instances
 
-  - name: add instance to inventory / docker_aws group
-    add_host:
-     hostname: "{{item.private_ip}}"
-     groups: docker_aws
-    with_items: docker_ct.tagged_instances
+  # this doesn't work very well, given that aws
+  # doesn't let you modify existing launch configs:
+  - name: ensure docker launch config 
+    ec2_lc: 
+     name: pm_docker
+     region: "{{region}}"
+     image_id: "{{docker_image}}"
+     # this sucks, but aws requires IDs here, not names:
+     security_groups: [sg-43ccb73a, sg-72793f0b, sg-86783eff]
+     key_name: "{{key_name}}"
+     instance_type: "{{instance_type}}"
+     instance_profile_name: "{{instance_profile}}"
+     user_data: "#!/bin/bash\necho ECS_CLUSTER={{ecs_cluster}} >> /etc/ecs/ecs.config\n"
+    register: docker_lc
+    tags:
+    - lc
 
+  - name: ensure auto-scaling group
+    ec2_asg:
+     name: pm_docker
+     region: "{{region}}"
+     launch_config_name: pm_docker
+     min_size: 3
+     max_size: 3
+    tags:
+    - asg
+   
   - name: wait for mongo instance accessible
     wait_for:
      host: "{{item.private_ip}}"
      port: 22
      search_regex: "OpenSSH"
     with_items: mongodb_ct.tagged_instances
-
-  - name: wait for docker instance accessible
-    wait_for:
-     host: "{{item.private_ip}}"
-     port: 22
-     search_regex: "OpenSSH"
-    with_items: docker_ct.tagged_instances
 
 # mongo provision play
 - name: mongodb on mongodb_ct.tagged_instances

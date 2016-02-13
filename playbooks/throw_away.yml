@@ -6,4 +6,4 @@
   roles:
   - { role: aws_inbound_sg, port_number: 22, sg_name: 'ssh' }
   - { role: aws_outbound_sg } # default unrestricted
-  - { role: aws_throw_away, image_id: ami-60b6c60a }
+  - { role: aws_throw_away, image_id: ami-60b6c60a, vpc_name: "testin}" }
