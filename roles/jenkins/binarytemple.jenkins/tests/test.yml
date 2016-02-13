@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - binarytemple.java
+    - ansible-role-jenkins

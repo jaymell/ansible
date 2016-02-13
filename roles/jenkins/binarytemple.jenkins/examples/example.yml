@@ -1,0 +1,17 @@
+- hosts: all
+  sudo: yes
+  pre_tasks:
+  - name: Ensure git is installed.
+    apt: pkg=git state=installed
+    when: ansible_os_family == 'Debian'
+  - name: Ensure dependencies are installed.
+    yum: pkg=libselinux-python state=installed
+    when: ansible_os_family == 'RedHat'
+  - name: Ensure dependencies are installed.
+    yum: pkg=git state=installed
+    when: ansible_os_family == 'RedHat'
+  vars:
+    - jenkins_http_port: 8081
+  roles:
+    - binarytemple.java
+    - binarytemple.jenkins

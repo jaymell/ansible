@@ -5,7 +5,7 @@
   hosts: localhost
   vars:
     region: us-east-1
-    instance_type: t2.micro
+    instance_type: t2.medium #t2.micro
     instance_profile: docker_builder
     key_name: docker_builder
     # ubuntu
@@ -48,7 +48,7 @@
      region: "{{region}}"
      instance_type: "{{instance_type}}"
      instance_profile_name: "{{instance_profile}}"
-     instance_tags: { type: docker_builder }
+     instance_tags: { type: docker_builder , Name: docker_builder}
      key_name: "{{key_name}}"
      count_tag: { type: docker_builder }
      exact_count: "{{docker_count}}"

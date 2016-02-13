@@ -3,7 +3,7 @@
   ec2_group:
    name: "{{sg_name}}"
    region: "{{region}}"
-   description: allow inbound "{{sg_name}}"
+   description: "{{sg_name}}" 
    rules:
    - proto: "{{proto}}"
      from_port: "{{port_number}}"

@@ -1,0 +1,19 @@
+---
+- name: provision throwaway
+  hosts: localhost
+  vars:
+    region: us-east-1
+    instance_tag: { type: Jenkins, Name: jenkins}
+  roles:
+  - { role: aws_inbound_sg, port_number: 22, sg_name: 'ssh' }
+  - { role: aws_inbound_sg, port_number: 8080, sg_name: 'jenkins' }
+  - { role: aws_outbound_sg } # default unrestricted
+  - { role: aws_throw_away, image_id: ami-60b6c60a, tag: "{{instance_tag}}" } # amazon linux
+
+#- name: install the jenkins
+#  hosts: throw_away
+#  become: yes
+#  remote_user: ec2-user
+#  roles:
+#  - jenkins
+

@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+# Ensure basho.riak-common dependency is in place
+if [ "up", "provision" ].include?(ARGV.first) && File.directory?("roles") &&
+  !(File.directory?("roles/binarytemple.java") || File.symlink?("roles/binarytemple.java"))
+  system("ansible-galaxy install -r roles.txt -p roles --ignore-errors")
+end
+
+$platform = ENV["TEST_OS"]
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |cluster|
+  
+  cluster.vm.box = if $platform == "UBUNTU"
+    "bento/ubuntu-14.04"
+  elsif $platform == "CENTOS"
+    "bento/centos-6.7"
+  elsif $platform == "DEBIAN"
+    "bento/debian-7.4"
+  else
+    "bento/ubuntu-14.04"
+  end
+
+  cluster.vm.define "example" do |machine|
+      machine.vm.hostname = "binarytemple.jenkins"
+      machine.vm.provision "ansible" do |ansible|
+        ansible.playbook = "./example.yml"
+        ansible.verbose = "vvvv"
+        ansible.limit = "all"
+      end
+  end
+end
