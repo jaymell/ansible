@@ -14,7 +14,7 @@
    exact_count: "{{count}}"
    # group: "{{groups}}"
    group: "{{security_groups}}"
-   vpc: "{{vpc_name}}"
+   # vpc: "{{vpc_name}}"
    wait: yes
   register: throw_away
 

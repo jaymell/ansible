@@ -1,5 +1,6 @@
+---
 - name: enable repo from template
-  template: src >
+  template: >
     src="docker.repo.j2"
     dest="/etc/yum.repos.d/docker.repo"
     owner=root group=root mode=0644
@@ -7,5 +8,5 @@
 - name: install necessary packages
   yum: name={{item}} state=present
   with_items:
-    - docker-engine
+  - docker-engine
 

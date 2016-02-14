@@ -34,6 +34,17 @@
        from_port: 22
        to_port: 22
        cidr_ip: 0.0.0.0/0
+  - name: create docker security group
+    ec2_group:
+     name: docker
+     region: "{{region}}"
+     description: allow inbound docker
+     rules:
+     - proto: tcp
+       from_port: 2376
+       to_port: 2376
+       cidr_ip: 0.0.0.0/0
+
   - name: create outbound security group
     ec2_group:
      name: outbound
@@ -52,7 +63,7 @@
      key_name: "{{key_name}}"
      count_tag: { type: docker_builder }
      exact_count: "{{docker_count}}"
-     group: [ ssh, outbound ]
+     group: [ ssh, outbound, docker ]
      wait: yes
     register: docker_ct
   - name: add instance to inventory / docker_aws group

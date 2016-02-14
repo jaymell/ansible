@@ -1,0 +1,29 @@
+---
+- name: create/update task def and service in aws ecs
+  hosts: localhost
+  vars:
+   region: us-east-1
+   revision_number: 70
+   repository_url: 799617403160.dkr.ecr.us-east-1.amazonaws.com
+   flask_repository: pm-flask-2
+   nginx_repository: pm-nginx
+  tasks:
+  - name: task definition
+    ecs_taskdefinition:
+     family: photo_mapper
+     state: absent
+     revision: 15
+     region: "{{region}}"
+     containers:
+     - name: pm-flask
+       image: "{{repository_url}}/{{flask_repository}}:{{revision_number}}"
+       memory: 512
+     - name: nginx
+       image: "{{repository_url}}/{{nginx_repository}}:latest"
+       memory: 256
+       links:
+       - pm-flask
+       portMappings:
+        containerPort: 80
+        hostPort: 80
+   

@@ -1,0 +1,23 @@
+---
+- name: clear s3 bucket
+  hosts: localhost
+  vars:
+   bucket: photomapper
+  tasks:
+  - name: get list of keys
+    s3:
+     bucket: "{{bucket}}"
+     mode: list
+    register: s3_list
+  - name: delete keys
+    s3: 
+     bucket: "{{bucket}}"
+     mode: delobj
+     object: "{{item}}"
+    with_items: s3_list.s3_keys
+     
+- name: drop mongo collection
+  hosts: 54.164.119.166
+  tasks:
+  - name: drop photo_mapper.photo_mapper collection
+    command: 'mongo photo_mapper --eval "db.photo_mapper.drop();"'
