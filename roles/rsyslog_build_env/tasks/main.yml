@@ -1,0 +1,74 @@
+---
+  - yum: name=libselinux-python state=present
+  - name: disable selinux
+    selinux: state=disabled
+    ignore_errors: true
+  - name: remove stock rsyslog
+    yum: 
+      name: rsyslog 
+      state: absent
+  - name: add rsyslog repo
+    copy:
+      src: files/rsyslog.repo
+      dest: /etc/yum.repos.d/rsyslog.repo
+#    yumrepo:
+#      baseurl: http://rpms.adiscon.com/v8-stable/epel-6/$basearch
+#      gpgkey: http://rpms.adiscon.com/RPM-GPG-KEY-Adiscon
+#      protect: yes
+#      state: present
+  - name: install epel repo
+    yum: name=epel-release state=present
+  - name: install packages
+    yum: name="{{item}}" state=present enablerepo=epel
+    ### this list can be cleaned up big time: ####
+    with_items:
+    - pkgconfig 
+    - git 
+    - automake 
+    - libtool 
+    - zlib-devel 
+    - uuid 
+    - libgcrypt-devel 
+    - flex 
+    - bison 
+    - uuid-devel 
+    - libuuid-devel 
+    - liblogging-devel 
+    - json-c-devel 
+    - hiredis-devel 
+    - python-docutils 
+    - python-sphinx 
+    - openssl-devel 
+    - libcurl-devel 
+    - gnutls-devel 
+    - mysql-devel 
+  - name: clone rsyslog git repo
+    become: no
+    git:
+      repo: https://github.com/rsyslog/rsyslog.git
+      dest: ~/rsyslog
+      version: v8-stable
+      force: yes
+
+  - name: clone my fork
+    become: no
+    git:
+      repo: https://github.com/jaymell/rsyslog.git
+      dest: ~/jsyslog
+      force: yes
+
+  - name: start redis
+    service: name=redis state=started
+
+  - name: test rsyslog config
+    copy: src="{{item.name}}" dest="{{item.dest}}" mode=0644
+    with_items:
+    - { name: files/rsyslog.conf, dest: /etc/rsyslog.conf }
+    - { name: files/22-redis.conf, dest: /etc/rsyslog.d/22-redis.conf }
+
+  - name: put syntax for check in file
+    become: no
+    copy: content="{{item}}" dest=~/check-config-syntax
+    with_items: "autoreconf -fiv\n./configure --enable-omhiredis\nmake\nsudo make install\n/usr/local/sbin/rsyslogd -N1\n\n"
+
+
