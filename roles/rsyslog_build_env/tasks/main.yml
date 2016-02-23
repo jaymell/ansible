@@ -42,6 +42,12 @@
     - libcurl-devel 
     - gnutls-devel 
     - mysql-devel 
+    - postgresql-devel
+    - libdbi-dbd-mysql
+    - libdbi-devel
+    - net-snmp-devel
+    - redis
+    - libfastjson-devel
   - name: clone rsyslog git repo
     become: no
     git:
