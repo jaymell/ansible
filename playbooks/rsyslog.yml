@@ -12,6 +12,8 @@
   hosts: throw_away
   become: yes
   remote_user: ec2-user
+  roles: 
+  - the_basics
   tasks:
   - yum: name=libselinux-python state=present
   - name: disable selinux

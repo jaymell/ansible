@@ -6,11 +6,14 @@
   become: no
   copy: >
     src=.vimrc 
-    dest="/home/{{user}}/.vimrc"
+    dest="~/.vimrc"
     mode=0664
-    owner="{{user}}"
-    group="{{user}}"
   tags: vim
 
-- name: ensure ssh running
+- name: ensure ssh enabled
   service: name=ssh enabled=yes state=started
+  when: ansible_os_family=='Debian'
+
+- name: ensure ssh enabled
+  service: name=sshd enabled=yes state=started
+  when: ansible_os_family=='RedHat'
