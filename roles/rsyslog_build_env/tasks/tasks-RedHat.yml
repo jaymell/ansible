@@ -1,0 +1,51 @@
+---
+  - yum: name=libselinux-python state=present
+  - name: disable selinux
+    selinux: state=disabled
+    ignore_errors: true
+  - name: remove stock rsyslog
+    yum: 
+      name: rsyslog 
+      state: absent
+  - name: add rsyslog repo
+    copy:
+      src: files/rsyslog.repo
+      dest: /etc/yum.repos.d/rsyslog.repo
+#    yumrepo:
+#      baseurl: http://rpms.adiscon.com/v8-stable/epel-6/$basearch
+#      gpgkey: http://rpms.adiscon.com/RPM-GPG-KEY-Adiscon
+#      protect: yes
+#      state: present
+  - name: install epel repo
+    yum: name=epel-release state=present
+  - name: install packages
+    yum: name="{{item}}" state=present enablerepo=epel
+    ### this list can be cleaned up big time: ####
+    with_items:
+    - pkgconfig 
+    - git 
+    - automake 
+    - libtool 
+    - zlib-devel 
+    - uuid 
+    - libgcrypt-devel 
+    - flex 
+    - bison 
+    - uuid-devel 
+    - libuuid-devel 
+    - liblogging-devel 
+    - json-c-devel 
+    - hiredis-devel 
+    - python-docutils 
+    - python-sphinx 
+    - openssl-devel 
+    - libcurl-devel 
+    - gnutls-devel 
+    - mysql-devel 
+    - postgresql-devel
+    - libdbi-dbd-mysql
+    - libdbi-devel
+    - net-snmp-devel
+    - redis
+    - libfastjson-devel
+    - python-pip

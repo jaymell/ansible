@@ -1,0 +1,45 @@
+---
+  - name: remove stock rsyslog
+    yum:
+      name: rsyslog
+      state: absent
+  - name: add rsyslog repo key
+    apt_key: keyserver=keys.gnupg.net id=AEF0CF8E
+  - name: add rsyslog repos
+    apt_repository: repo={{item}} state=present
+    with_items:
+    - 'deb http://debian.adiscon.com/v8-stable wheezy/'
+    - 'deb-src http://debian.adiscon.com/v8-stable wheezy/'
+  - name: install packages
+    apt: name="{{item}}" state=present 
+    ### this list can be cleaned up big time: ####
+    with_items:
+    - pkgconfig
+    - git
+    - automake
+    - libtool
+    - zlib-dev
+    - uuid
+    - libgcrypt-dev
+    - flex
+    - bison
+    - uuid-dev
+    - libuuid-dev
+    - liblogging-dev
+    - json-c-dev
+    - hiredis-dev
+    - python-docutils
+    - python-sphinx
+    - openssl-dev
+    - libcurl-dev
+    - gnutls-dev
+    - mysql-dev
+    - postgresql-dev
+    - libdbi-dbd-mysql
+    - libdbi-dev
+    - net-snmp-dev
+    - redis
+    - libfastjson-dev
+    - python-pip
+~
+

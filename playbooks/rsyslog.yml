@@ -1,8 +1,7 @@
 ---
 - name: set up environment for compiling rsyslog
-  hosts: rsyslog
+  hosts: centos6_throwaway,centos7_throwaway
   become: yes
-  remote_user: centos
   roles: 
   - the_basics
   - rsyslog_build_env
