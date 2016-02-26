@@ -1,6 +1,6 @@
 ---
   - name: remove stock rsyslog
-    yum:
+    apt:
       name: rsyslog
       state: absent
   - name: add rsyslog repo key
@@ -14,32 +14,40 @@
     apt: name="{{item}}" state=present 
     ### this list can be cleaned up big time: ####
     with_items:
-    - pkgconfig
+    - pkg-config
     - git
     - automake
     - libtool
-    - zlib-dev
+#    - zlib-dev
     - uuid
     - libgcrypt-dev
     - flex
     - bison
     - uuid-dev
-    - libuuid-dev
-    - liblogging-dev
-    - json-c-dev
-    - hiredis-dev
+#    - libuuid-dev
+#    - liblogging-dev
+    - liblogging-stdlog-dev
+#    - json-c-dev
+    - libjson-c-dev
+#    - hiredis-dev
+    - libhiredis-dev
     - python-docutils
     - python-sphinx
-    - openssl-dev
-    - libcurl-dev
-    - gnutls-dev
-    - mysql-dev
-    - postgresql-dev
-    - libdbi-dbd-mysql
+#    - openssl-dev
+#    - libcurl-dev
+#    - libcurl4-openssl-dev
+#    - libcurl4-gnutls-dev
+#    - gnutls-dev
+#    - mysql-dev
+#    - postgresql-dev
+#    - libdbi-dbd-mysql
     - libdbi-dev
-    - net-snmp-dev
-    - redis
+#    - net-snmp-dev
+    - redis-server
     - libfastjson-dev
     - python-pip
-~
+
+  - name: start redis 
+    service: name=redis-server state=started enabled=yes
+
 

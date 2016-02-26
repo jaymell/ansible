@@ -49,3 +49,6 @@
     - redis
     - libfastjson-devel
     - python-pip
+
+  - name: start redis
+    service: name=redis state=started enabled=yes

@@ -1,0 +1,69 @@
+---
+- name: provision throwaway
+  hosts: localhost
+  vars:
+    region: us-east-1
+    count: 1
+    tag_name: centos7_throwaway
+    tag: { Name: "{{tag_name}}" }
+    inventory_group: "{{tag_name}}"
+  roles:
+  - { role: aws_inbound_sg, port_number: 22, sg_name: 'ssh' }
+  - { role: aws_outbound_sg } # default unrestricted
+  - { role: aws_throw_away, image_id: ami-61bbf104, vpc_name: "testin}" }
+
+- name: provision throwaway
+  hosts: localhost
+  vars:
+    region: us-east-1
+    count: 1
+    tag_name: centos6_throwaway
+    tag: { Name: "{{tag_name}}" }
+    inventory_group: "{{tag_name}}"
+
+  roles:
+  - { role: aws_throw_away, image_id: ami-57cd8732, vpc_name: "testin}" }
+
+- name: provision throwaway
+  hosts: localhost
+  vars:
+    region: us-east-1
+    count: 1
+    tag_name: amazonlinux_throwaway
+    tag: { Name: "{{tag_name}}" }
+    inventory_group: "{{tag_name}}"
+  roles:
+  - { role: aws_throw_away, image_id: ami-60b6c60a, vpc_name: "testin}" }
+
+
+
+- name: provision throwaway
+  hosts: localhost
+  vars:
+    region: us-east-1
+    count: 1
+    tag_name: debian7_throwaway
+    tag: { Name: "{{tag_name}}" }
+    inventory_group: "{{tag_name}}"
+  roles:
+  - { role: aws_throw_away, image_id: ami-e0efab88, vpc_name: "testin}" }
+
+
+- name: provision throwaway
+  hosts: localhost
+  vars:
+    region: us-east-1
+    count: 1
+    tag_name: debian8_throwaway
+    tag: { Name: "{{tag_name}}" }
+    inventory_group: "{{tag_name}}"
+  roles:
+  - { role: aws_throw_away, image_id: ami-116d857a, vpc_name: "testin}" }
+
+- name: set up environment for compiling rsyslog
+  hosts: centos6_throwaway,centos7_throwaway,debian7_throwaway,debian8_throwaway
+  become: yes
+  roles:
+  - the_basics
+  - rsyslog_build_env
+

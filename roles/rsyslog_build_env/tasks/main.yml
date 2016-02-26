@@ -26,9 +26,6 @@
     dest: ~/jsyslog
     force: yes
 
-- name: start redis
-  service: name=redis state=started
-
 - name: create conf.d
   file: name=/etc/rsyslog.d state=directory mode=0755
 
