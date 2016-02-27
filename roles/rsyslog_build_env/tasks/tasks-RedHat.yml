@@ -52,3 +52,14 @@
 
   - name: start redis
     service: name=redis state=started enabled=yes
+
+
+#  - name: test not having hiredis installed
+#    yum: name="{{item}}" state=absent
+#    with_items:
+#    - hiredis
+#    - hiredis-devel
+#    tags:
+#    - nohiredis
+
+                    

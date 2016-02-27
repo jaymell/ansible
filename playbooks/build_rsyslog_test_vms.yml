@@ -61,7 +61,7 @@
   - { role: aws_throw_away, image_id: ami-116d857a, vpc_name: "testin}" }
 
 - name: set up environment for compiling rsyslog
-  hosts: centos6_throwaway,centos7_throwaway,debian7_throwaway,debian8_throwaway
+  hosts: centos6_throwaway,centos7_throwaway,debian7_throwaway,debian8_throwaway,amazonlinux_throwaway
   become: yes
   roles:
   - the_basics

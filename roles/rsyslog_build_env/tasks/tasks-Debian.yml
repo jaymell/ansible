@@ -46,8 +46,18 @@
     - redis-server
     - libfastjson-dev
     - python-pip
+    - libestr-dev
+    - zlib1g-dev
 
   - name: start redis 
     service: name=redis-server state=started enabled=yes
+
+#  - name: test not having hiredis installed
+#    apt: name="{{item}}" state=absent
+#    with_items:
+#    - libhiredis
+#    - libhiredis-dev
+#    tags:
+#    - nohiredis
 
 
