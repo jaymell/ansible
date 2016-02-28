@@ -23,7 +23,7 @@
   become: no
   git:
     repo: https://github.com/jaymell/rsyslog.git
-    #version: testReverseExitCodes
+    version: fixHiredisCheck
     dest: ~/jsyslog
     force: yes
 
@@ -46,24 +46,24 @@
 
 - name: delete any previous stuff
   become: no
-  command: bash -c "cd ~/jsyslog && make dist clean"
+  command: bash -c "cd ~/{{repo_dir}} && make dist clean"
   ignore_errors: True
 
 - name: autoreconf
   become: no
-  command: bash -c "cd ~/jsyslog && autoreconf -fiv" 
+  command: bash -c "cd ~/{{repo_dir}} && autoreconf -fiv" 
 
 - name: configure
   become: no
-  command: bash -c "cd ~/jsyslog && ./configure --enable-omhiredis=yes"
-  #command: bash -c "cd ~/jsyslog && ./configure"
+  command: bash -c "cd ~/{{repo_dir}} && ./configure --enable-omhiredis=yes"
+  #command: bash -c "cd ~/{{repo_dir}} && ./configure"
 
 - name: make
   become: no
-  command: bash -c "cd ~/jsyslog && make"
+  command: bash -c "cd ~/{{repo_dir}} && make"
 
 - name: install
-  command: bash -c "cd /home/{{ansible_user}}/jsyslog && make install"
+  command: bash -c "cd /home/{{ansible_user}}/{{repo_dir}} && make install"
 
 - name: kill any running rsyslog
   command: bash -c "pkill rsyslogd"
