@@ -1,0 +1,14 @@
+---
+#aws ec2 describe-images --filters Name=owner-id,Values=099720109477
+- name: provision throwaway
+  hosts: localhost
+  vars:
+    region: us-east-1
+    user_data: |
+        ##cloud-config
+        snappy:
+            ssh_enabled: True
+  roles:
+  - { role: aws_inbound_sg, port_number: 22, sg_name: 'ssh' }
+  - { role: aws_outbound_sg } # default unrestricted
+  - { role: aws_throw_away, image_id: ami-28cbfe42 }

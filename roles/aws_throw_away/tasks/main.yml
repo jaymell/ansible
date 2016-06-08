@@ -12,6 +12,7 @@
    key_name: "{{key_name}}"
    count_tag: "{{tag}}"
    exact_count: "{{count}}"
+   user_data: "{{user_data}}"
    # group: "{{groups}}"
    group: "{{security_groups}}"
    # vpc: "{{vpc_name}}"
