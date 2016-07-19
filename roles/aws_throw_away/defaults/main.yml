@@ -1,10 +1,11 @@
 ---
+app: default
 inventory_group: throw_away
 instance_type: t2.micro
 key_name: throw_away
 # ubuntu -- would be better to make sure this is latest with ec2_ami_find:
 image_id: ami-fce3c696
-tag: { throw_away: True, Name: throw_away}
+tag: { type: throw_away, Name: "{{app}}-throw_away" }
 count: 1
 security_groups: ["ssh", "outbound"]
 vpc_name: default
