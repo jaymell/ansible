@@ -1,3 +1,5 @@
 hosts
 playsbooks/hosts
 *.swp
+inventory
+*.retry

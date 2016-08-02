@@ -1,0 +1,9 @@
+---
+- name: do debian things on debian hosts
+  include: "tasks-Debian.yml"
+  when: ansible_os_family=='Debian'
+
+- name: do redhat things on redhat hosts
+  include: "tasks-RedHat.yml"
+  when: ansible_os_family=='RedHat'
+

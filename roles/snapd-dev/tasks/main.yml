@@ -1,0 +1,19 @@
+---
+- name: install apt stuff
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  with_items:
+  - golang
+  - bzr
+
+- name: go get godeps
+  become: yes
+  become_user: "{{user_name}}"
+  shell: "GOPATH={{go_path}} go get launchpad.net/godeps"
+  
+- name: go get snapd and deps
+  become: yes
+  become_user: "{{user_name}}"
+  shell: "GOPATH={{go_path}} go get -d -v github.com/snapcore/snapd/..."

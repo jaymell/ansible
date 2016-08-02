@@ -1,0 +1,31 @@
+---
+- include: tasks-Ubuntu.yml
+  when: "ansible_distribution == 'Ubuntu'"
+
+- include: tasks-RedHat.yml
+  when: "ansible_os_family == 'RedHat'"
+
+- name: ensure dirs exist
+  become_user: "{{user_name}}"
+  file:
+    path: "{{item}}"
+    state: directory
+    owner: "{{user_name}}" 
+    group: "{{user_name}}" 
+  with_items:
+  - "{{go_path}}"
+  - "{{go_path}}/bin"
+
+- name: set gopath
+  lineinfile:
+    dest: "/home/{{user_name}}/.bashrc"
+    regexp: "^export GOPATH=.*"
+    line: "export GOPATH={{go_path}}"
+
+- name: add "{{go_path}}/go/bin" to PATH
+  lineinfile:
+   dest: "/home/{{user_name}}/.bashrc"
+   regexp: "^export PATH=.*"
+   line: "export PATH=$GOPATH/bin:$PATH"
+   insertafter: "export GOPATH={{go_path}}"
+

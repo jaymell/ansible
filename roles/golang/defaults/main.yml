@@ -1,0 +1,3 @@
+---
+user_name: ubuntu
+go_path: "/home/{{user_name}}/go"
