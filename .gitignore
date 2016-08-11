@@ -3,3 +3,4 @@ playsbooks/hosts
 *.swp
 inventory
 *.retry
+roles/git-config/defaults/main.yml

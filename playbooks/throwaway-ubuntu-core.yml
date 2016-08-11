@@ -4,6 +4,7 @@
   hosts: localhost
   vars:
     region: us-east-1
+    app: ubuntu-core
     user_data: |
         ##cloud-config
         snappy:
