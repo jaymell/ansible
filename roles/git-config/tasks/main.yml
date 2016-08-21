@@ -5,11 +5,11 @@
     value: "{{user_email}}"
     scope: local
     repo: "{{repo}}"
-  become_user: "{{user}}"
+  become: no
 - name: configure git name
   git_config:
     name: user.name
     value: "{{user_name}}" 
     scope: local
     repo: "{{repo}}"
-  become_user: "{{user}}"
+  become: no

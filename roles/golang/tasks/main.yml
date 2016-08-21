@@ -6,7 +6,7 @@
   when: "ansible_os_family == 'RedHat'"
 
 - name: ensure dirs exist
-  become_user: "{{user_name}}"
+  become: no
   file:
     path: "{{item}}"
     state: directory

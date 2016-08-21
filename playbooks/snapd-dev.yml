@@ -5,6 +5,8 @@
     region: us-east-1
     ami_id: ami-ddf13fb0
     app: ubuntu-16
+    user_name: ubuntu
+
 
   roles:
   - { role: aws_inbound_sg, port_number: 22, sg_name: 'ssh' }

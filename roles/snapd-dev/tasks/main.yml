@@ -9,11 +9,9 @@
   - bzr
 
 - name: go get godeps
-  become: yes
-  become_user: "{{user_name}}"
+  become: no
   shell: "GOPATH={{go_path}} go get launchpad.net/godeps"
   
 - name: go get snapd and deps
-  become: yes
-  become_user: "{{user_name}}"
+  become: no
   shell: "GOPATH={{go_path}} go get -d -v github.com/snapcore/snapd/..."

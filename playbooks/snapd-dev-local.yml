@@ -1,0 +1,10 @@
+--- 
+- name: provision throwaway
+  hosts: debvisor
+  become: yes
+  vars:
+    user_name: james
+  roles: 
+  - snapd-dev
+  - { role: git-config, repo: "/home/{{user_name}}/go/src/github.com/snapcore/snapd" }
+
