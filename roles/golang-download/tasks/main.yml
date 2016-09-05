@@ -1,0 +1,50 @@
+---
+#- name: ensure "{{go_root}}" exists
+#  file:
+#    path: "{{go_root}}"
+#    recurse: yes
+#    state: directory
+
+- name: download
+  unarchive:
+    src: "{{golang_source}}"
+    copy: no
+    dest: "{{go_root_root}}"
+
+- name: create symlink to binary
+  file:  
+    src: "{{go_root}}/bin/go"
+    dest: /usr/local/bin/go
+    state: link
+
+- name: ensure dirs exist
+  become: no
+  file:
+    path: "{{item}}"
+    state: directory
+    owner: "{{user_name}}"
+    group: "{{user_name}}"
+  with_items:
+  - "{{go_path}}"
+  - "{{go_path}}/bin"
+  - "{{go_path}}/src"
+
+- name: set goroot
+  lineinfile:
+    dest: "/home/{{user_name}}/.bashrc"
+    regexp: "^export GOROOT=.*"
+    line: "export GOPATH={{go_root}}"
+
+- name: set gopath
+  lineinfile:
+    dest: "/home/{{user_name}}/.bashrc"
+    regexp: "^export GOPATH=.*"
+    line: "export GOPATH={{go_path}}"
+
+- name: add "{{go_path}}/bin" to PATH
+  lineinfile:
+   dest: "/home/{{user_name}}/.bashrc"
+   regexp: "^export PATH=.*"
+   line: "export PATH=$GOPATH/bin:$PATH"
+   insertafter: "export GOPATH={{go_path}}"
+

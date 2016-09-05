@@ -1,0 +1,10 @@
+---
+- name: create outbound security group
+  ec2_group:
+   name: outbound
+   region: "{{region}}"
+   description: allow outbound connections
+   rules_egress:
+   - proto: "{{proto}}"
+     cidr_ip: "{{outbound_ip_range}}"
+

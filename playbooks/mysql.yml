@@ -1,0 +1,4 @@
+- hosts: ubu-phys-00
+  roles: 
+  - mysql
+  become: yes
