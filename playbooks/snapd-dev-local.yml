@@ -1,6 +1,18 @@
 --- 
+# two separate playbooks b/c no python2 in ubuntu 16 by default;
+# "gather_facts: no" essential to allow its raw installation
+
 - name: provision throwaway
-  hosts: debvisor
+  hosts: ubu-phys-00
+  become: yes
+  gather_facts: no
+  tasks:
+  - name: install python2
+    raw: sudo apt-get update && sudo apt-get -y install python-simplejson
+
+# separate play
+- name: provision throwaway
+  hosts: ubu-phys-00
   become: yes
   vars:
     user_name: james

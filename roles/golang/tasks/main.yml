@@ -22,7 +22,7 @@
     regexp: "^export GOPATH=.*"
     line: "export GOPATH={{go_path}}"
 
-- name: add "{{go_path}}/go/bin" to PATH
+- name: add "{{go_path}}/bin" to PATH
   lineinfile:
    dest: "/home/{{user_name}}/.bashrc"
    regexp: "^export PATH=.*"
