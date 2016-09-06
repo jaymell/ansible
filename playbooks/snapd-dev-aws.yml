@@ -42,4 +42,23 @@
   roles: 
   - snapd-dev
   - { role: git-config, repo: /home/ubuntu/go/src/github.com/snapcore/snapd, user: ubuntu }
+  tasks:
+  - name: bashrc helpers
+    blockinfile:
+      dest: /home/ubuntu/.bashrc
+      block: |
+        function snapd() {
+          case $1 in
+            start)
+              sudo systemctl stop snapd.service snapd.socket
+              sudo /lib/systemd/systemd-activate -E SNAPD_DEBUG=1 -l /run/snapd.socket $GOPATH/bin/snapd &
+              sleep 2
+              sudo chmod 666 /run/snapd.socket
+              ;;
+            build)
+              go clean
+              go install github.com/snapcore/snapd/...
+              ;;
+          esac
+        }
 
