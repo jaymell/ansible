@@ -1,11 +1,13 @@
 ---
-#aws ec2 describe-images --filters Name=owner-id,Values=099720109477
+# provision / ensure aws environment
 - name: provision camlistore aws instance
   hosts: localhost
   vars:
+    # overwrite these on cli via --extra-vars if needed:
     region: us-east-1
     ami_id: ami-ddf13fb0
     app: ubuntu-16
+    # can this be dynamic based on below?
     security_groups: ["ssh", "http", "outbound", "camlistore"]
 
   pre_tasks:
@@ -37,7 +39,6 @@
   roles:
   - { role: aws_throw_away, image_id: "{{ami_id}}" }
 
-
   tasks:
   - name: add instance to inventory
     add_host:
@@ -52,6 +53,7 @@
      search_regex: "OpenSSH"
     with_items: "{{throw_away.tagged_instances}}"
 
+# pre-play -- install python 2
 - name: install python2
   hosts: camlistore
   gather_facts: no
@@ -60,13 +62,22 @@
   - name: 'install python2'
     raw: sudo apt-get update && sudo apt-get -y install python-simplejson
 
+# actually ssh to a server and do stuff
 - name: provision instance
   hosts: camlistore
   become: yes
   remote_user: ubuntu
   roles:
   - golang-download
+  # bennojoy's awesome mysql provisioning role -- forked @ https://github.com/jaymell/mysql:
+  - { role: bennojoy-mysql,  mysql_root_db_pass: "{{mysql_root_pass}}" } 
   tasks:
   - shell: cd ~/go/src && git clone https://camlistore.googlesource.com/camlistore && cd camlistore && go run make.go
+#  - shell: go install github.com/camlistore/camlistore/...
+    become: ubuntu
+    creates: "{{go_path}}/src/camlistore"
+
+  - shell: cd ~/go/src/camlistore && bin/camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore
+#  - shell: camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore
     become: ubuntu
 
