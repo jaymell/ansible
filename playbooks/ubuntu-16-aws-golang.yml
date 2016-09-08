@@ -1,0 +1,72 @@
+---
+# provision / ensure aws environment
+- name: provision camlistore aws instance
+  hosts: localhost
+  vars:
+    # overwrite these on cli via --extra-vars if needed:
+    region: us-east-1
+    ami_id: ami-ddf13fb0
+    app: ubuntu-16
+    # can this be dynamic based on below?
+    security_groups: ["ssh", "http", "outbound", "camlistore"]
+
+  pre_tasks:
+  - include: aws_inbound_sg.yml 
+    vars:
+      source_ip_range: 0.0.0.0/0
+      proto: tcp
+      port_number: 22
+      sg_name: 'ssh'
+  - include: aws_inbound_sg.yml
+    vars:
+      source_ip_range: 0.0.0.0/0
+      proto: tcp
+      port_number: 80
+      sg_name: 'http'
+  - include: aws_inbound_sg.yml
+    vars:
+      source_ip_range: 0.0.0.0/0
+      proto: tcp
+      port_number: 3179
+      sg_name: 'camlistore'
+
+  - include: aws_outbound_sg.yml
+    vars:
+      outbound_ip_range: 0.0.0.0/0
+      proto: all
+      sg_name: 'outbound'
+
+  roles:
+  - { role: aws_throw_away, image_id: "{{ami_id}}" }
+
+  tasks:
+  - name: add instance to inventory
+    add_host:
+     hostname: "{{item.public_ip}}"
+     groups: camlistore
+    with_items: "{{throw_away.tagged_instances}}"
+
+  - name: wait for instance accessible
+    wait_for:
+     host: "{{item.public_ip}}"
+     port: 22
+     search_regex: "OpenSSH"
+    with_items: "{{throw_away.tagged_instances}}"
+
+# pre-play -- install python 2
+- name: install python2
+  hosts: camlistore
+  gather_facts: no
+  remote_user: ubuntu
+  tasks:
+  - name: 'install python2'
+    raw: sudo apt-get update && sudo apt-get -y install python-simplejson
+
+# actually ssh to a server and do stuff
+- name: provision instance
+  hosts: camlistore
+  become: yes
+  remote_user: ubuntu
+  roles:
+  - golang-download
+  - c_compiler
