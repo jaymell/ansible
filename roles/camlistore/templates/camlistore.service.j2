@@ -7,8 +7,6 @@ Requires=mysql.service
 ExecStart=/home/{{become_user}}/go/src/camlistore/bin/camlistored
 RestartSec=1s
 Restart=always
-Type=notify
-NotifyAccess=all
 
 [Install]
 WantedBy=multi-user.target
