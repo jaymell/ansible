@@ -37,7 +37,7 @@
       sg_name: 'outbound'
 
   roles:
-  - { role: aws_throw_away, image_id: "{{ami_id}}" }
+  - { role: aws_ec2, image_id: "{{ami_id}}" }
 
   tasks:
   - name: add instance to inventory

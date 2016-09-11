@@ -1,0 +1,17 @@
+- name: "create {{key_name}} key pair"
+  ec2_key:
+    region: "{{region}}"
+    name: "{{key_name}}"
+  register: ec2_key
+
+- debug: var=ec2_key
+
+- name: save key to local folder
+  copy:
+    content: "{{ ec2_key.key.private_key }}"
+    dest: "~/.ssh/{{item}}.pem"
+    mode: 0600
+  when: ec2_key | changed
+  with_items:
+  - "{{key_name}}"
+

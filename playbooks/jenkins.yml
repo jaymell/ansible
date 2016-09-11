@@ -8,7 +8,7 @@
   - { role: aws_inbound_sg, port_number: 22, sg_name: 'ssh' }
   - { role: aws_inbound_sg, port_number: 8080, sg_name: 'jenkins' }
   - { role: aws_outbound_sg } # default unrestricted
-  - { role: aws_throw_away, image_id: ami-60b6c60a, tag: "{{instance_tag}}", groups: [ssh,jenkins,outbound] } # amazon linux
+  - { role: aws_ec2, image_id: ami-60b6c60a, tag: "{{instance_tag}}", groups: [ssh,jenkins,outbound] } # amazon linux
 
 - name: install the jenkins
   hosts: throw_away

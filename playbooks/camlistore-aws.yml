@@ -6,52 +6,57 @@
     # overwrite these on cli via --extra-vars if needed:
     region: us-east-1
     ami_id: ami-ddf13fb0
-    app: ubuntu-16
+    app: camlistore
     # can this be dynamic based on below?
     security_groups: ["ssh", "http", "outbound", "camlistore"]
+    tag: { type: camlistore, Name: "{{app}}" }
 
   pre_tasks:
-  - include: aws_inbound_sg.yml 
+  - include: tasks/aws_inbound_sg.yml 
     vars:
       source_ip_range: 0.0.0.0/0
       proto: tcp
       port_number: 22
       sg_name: 'ssh'
-  - include: aws_inbound_sg.yml
+  - include: tasks/aws_inbound_sg.yml
     vars:
       source_ip_range: 0.0.0.0/0
       proto: tcp
       port_number: 80
       sg_name: 'http'
-  - include: aws_inbound_sg.yml
+  - include: tasks/aws_inbound_sg.yml
     vars:
       source_ip_range: 0.0.0.0/0
       proto: tcp
       port_number: 3179
       sg_name: 'camlistore'
 
-  - include: aws_outbound_sg.yml
+  - include: tasks/aws_outbound_sg.yml
     vars:
       outbound_ip_range: 0.0.0.0/0
       proto: all
       sg_name: 'outbound'
 
+  - include: tasks/create_ec2_key.yml
+    vars:
+      key_name: camlistore
+
   roles:
-  - { role: aws_throw_away, image_id: "{{ami_id}}" }
+  - { role: aws_ec2, image_id: "{{ami_id}}", key_name: camlistore }
 
   tasks:
-  - name: add instance to inventory
+  - name: add instance to in-memory inventory so we can run plays on it later
     add_host:
      hostname: "{{item.public_ip}}"
      groups: camlistore
-    with_items: "{{throw_away.tagged_instances}}"
+    with_items: "{{ec2_instance.tagged_instances}}"
 
   - name: wait for instance accessible
     wait_for:
      host: "{{item.public_ip}}"
      port: 22
      search_regex: "OpenSSH"
-    with_items: "{{throw_away.tagged_instances}}"
+    with_items: "{{ec2_instance.tagged_instances}}"
 
 # pre-play -- install python 2
 - name: install python2
@@ -63,21 +68,27 @@
     raw: sudo apt-get update && sudo apt-get -y install python-simplejson
 
 # actually ssh to a server and do stuff
+# pass "mysql_root_pass" as an extra var on command line
 - name: provision instance
   hosts: camlistore
   become: yes
   remote_user: ubuntu
+
   roles:
   - golang-download
   # bennojoy's awesome mysql provisioning role -- forked @ https://github.com/jaymell/mysql:
   - { role: bennojoy-mysql,  mysql_root_db_pass: "{{mysql_root_pass}}" } 
+
   tasks:
-  - shell: cd ~/go/src && git clone https://camlistore.googlesource.com/camlistore && cd camlistore && go run make.go
+  - name: install camlistore manually
+    shell: cd ~/go/src && git clone https://camlistore.googlesource.com/camlistore && cd camlistore && go run make.go
 #  - shell: go install github.com/camlistore/camlistore/...
     become: ubuntu
-    creates: "{{go_path}}/src/camlistore"
+    args:
+      creates: "{{go_path}}/src/camlistore"
 
-  - shell: cd ~/go/src/camlistore && bin/camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore
+  - name: initialize camlistore db
+    shell: cd ~/go/src/camlistore && bin/camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore
 #  - shell: camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore
     become: ubuntu
 

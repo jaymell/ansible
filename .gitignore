@@ -4,4 +4,4 @@ playsbooks/hosts
 inventory
 *.retry
 roles/git-config/defaults/main.yml
-roles/mysql
+roles/bennojoy-mysql
