@@ -1,0 +1,10 @@
+{
+    "auth": "userpass:{{camlistore_user_name}}:{{camlistore_user_pass}}",
+    "listen": ":3179",
+    "identity": "{{gpg_fingerprint}}",
+    "identitySecretRing": "{{gpg_dest}}",
+    "packRelated": true,
+    "mysql": "root@localhost:{{mysql_root_pass}}",
+    "dbname": "camlistore",
+    "s3": "{{aws_api_key}}:{{aws_api_secret}}:{{s3_bucket}}"
+}

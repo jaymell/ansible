@@ -5,3 +5,4 @@ inventory
 *.retry
 roles/git-config/defaults/main.yml
 roles/bennojoy-mysql
+roles/camlistore/vars/main.yml

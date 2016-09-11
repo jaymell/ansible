@@ -75,20 +75,8 @@
   remote_user: ubuntu
 
   roles:
-  - golang-download
-  # bennojoy's awesome mysql provisioning role -- forked @ https://github.com/jaymell/mysql:
-  - { role: bennojoy-mysql,  mysql_root_db_pass: "{{mysql_root_pass}}" } 
-
-  tasks:
-  - name: install camlistore manually
-    shell: cd ~/go/src && git clone https://camlistore.googlesource.com/camlistore && cd camlistore && go run make.go
-#  - shell: go install github.com/camlistore/camlistore/...
-    become: ubuntu
-    args:
-      creates: "{{go_path}}/src/camlistore"
-
-  - name: initialize camlistore db
-    shell: cd ~/go/src/camlistore && bin/camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore
-#  - shell: camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore
-    become: ubuntu
+#  - golang-download
+  - role: bennojoy-mysql # bennojoy's awesome mysql provisioning role, forked @ https://github.com/jaymell/mysql
+    mysql_root_db_pass: "{{mysql_root_pass}}" 
+  - role: camlistore
 

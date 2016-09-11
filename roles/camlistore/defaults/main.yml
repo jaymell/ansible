@@ -1,0 +1,6 @@
+---
+go_path: "/home/{{become_user}}/go"
+home_dir: "/home/{{become_user}}"
+gpg_src: ~/.config/camlistore/identity-secring.gpg
+gpg_dest: "{{home_dir}}/.config/camlistore/identity-secring.gpg"
+camlistore_db_name: camlistore

@@ -1,0 +1,60 @@
+---
+- name: install camlistore manually
+  shell: cd ~/go/src && git clone https://camlistore.googlesource.com/camlistore && cd camlistore && go run make.go
+#  - shell: go install github.com/camlistore/camlistore/...
+  become: "{{become_user}}"
+  args:
+    creates: "{{go_path}}/src/camlistore"
+
+- name: initialize camlistore db
+  shell: cd ~/go/src/camlistore && bin/camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore -wipe
+#  - shell: camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore
+  become: "{{become_user}}"
+
+- name: copy camlistore unit file
+  template:
+    src: camlistore.service.j2
+    dest: /etc/systemd/system/camlistore.service
+
+- name: ensure camlistore dir exists
+  file:
+    path: "{{home_dir}}/.config/camlistore"
+    state: directory
+    owner: "{{become_user}}"
+    group: "{{become_user}}"
+    mode: 0700
+    recurse: yes
+
+- name: copy gpg key
+  copy:
+    src: "{{gpg_src}}"
+    dest: "{{home_dir}}/.config/camlistore/identity-secring.gpg"
+    owner: "{{become_user}}"
+    group: "{{become_user}}"
+    mode: 0600
+
+- name: get fingerprint from gpg key
+  shell: gpg --with-fingerprint "{{gpg_dest}}" | grep fingerprint | awk '{print $(NF-1) $NF}'
+  register: gpg_fingerprint_raw
+
+- debug: var=gpg_fingerprint_raw
+
+- name: register fingerprint # used in server-config.json
+  set_fact:
+    gpg_fingerprint: "{{ gpg_fingerprint_raw.stdout_lines[0] }}"
+
+- name: copy server config
+  template:
+    src: server-config.json.j2
+    dest: "{{home_dir}}/.config/camlistore/server-config.json"
+    owner: "{{become_user}}"
+    group: "{{become_user}}"
+    mode: 0600
+
+- name: enable/start camlistore service
+  systemd:
+    daemon_reload: yes
+    name: camlistore
+    state: started
+    enabled: yes
+
