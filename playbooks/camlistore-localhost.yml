@@ -1,0 +1,7 @@
+---
+- name: provision instance
+  hosts: localhost
+  become: yes
+
+  roles:
+  - golang-download
