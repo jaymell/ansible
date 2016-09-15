@@ -5,7 +5,7 @@
 #    recurse: yes
 #    state: directory
 
-- name: download
+- name: download / extract binaries
   unarchive:
     src: "{{golang_source}}"
     copy: no
