@@ -1,0 +1,11 @@
+---
+### run this play to see example of ansible variable recursion weirdness
+- name: create stacks
+  hosts: localhost
+  vars:
+    hello: "goodbye"
+  tasks:
+  - include: blowup.yml
+    vars:
+      hello: "{{hello}}"
+
