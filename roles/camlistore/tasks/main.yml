@@ -1,15 +1,24 @@
 ---
+- name: ensure gopath exists
+  file:
+    path: "{{go_path}}/src"
+    state: directory
+    recurse: yes
+  become: no
+
+- debug: var=go_path
+
 - name: install camlistore manually
   shell: cd ~/go/src && git clone https://camlistore.googlesource.com/camlistore && cd camlistore && go run make.go
 #  - shell: go install github.com/camlistore/camlistore/...
-  become: "{{become_user}}"
+  become: no
   args:
     creates: "{{go_path}}/src/camlistore"
 
 - name: initialize camlistore db
   shell: cd ~/go/src/camlistore && bin/camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore -wipe
 #  - shell: camtool dbinit -password "{{mysql_root_pass}}" --dbname camlistore
-  become: "{{become_user}}"
+  become: no
 
 - name: copy camlistore unit file
   template:
@@ -20,8 +29,8 @@
   file:
     path: "{{home_dir}}/.config/camlistore"
     state: directory
-    owner: "{{become_user}}"
-    group: "{{become_user}}"
+    owner: "{{ansible_user}}"
+    group: "{{ansible_user}}"
     mode: 0700
     recurse: yes
 
@@ -29,8 +38,8 @@
   copy:
     src: "{{gpg_src}}"
     dest: "{{home_dir}}/.config/camlistore/identity-secring.gpg"
-    owner: "{{become_user}}"
-    group: "{{become_user}}"
+    owner: "{{ansible_user}}"
+    group: "{{ansible_user}}"
     mode: 0600
 
 - name: get fingerprint from gpg key
@@ -47,8 +56,8 @@
   template:
     src: server-config.json.j2
     dest: "{{home_dir}}/.config/camlistore/server-config.json"
-    owner: "{{become_user}}"
-    group: "{{become_user}}"
+    owner: "{{ansible_user}}"
+    group: "{{ansible_user}}"
     mode: 0600
 
 - name: enable/start camlistore service

@@ -4,8 +4,8 @@ After=mysql.service
 Requires=mysql.service
 
 [Service]
-User={{remote_user}}
-ExecStart=/home/{{become_user}}/go/src/camlistore/bin/camlistored
+User={{ansible_user}}
+ExecStart=/home/{{ansible_user}}/go/src/camlistore/bin/camlistored
 RestartSec=1s
 Restart=always
 

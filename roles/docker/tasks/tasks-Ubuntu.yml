@@ -3,7 +3,7 @@
 
 # necessary to specify http instead of https on repo, despite docker webpage
 - name: enable Docker repo
-  apt_repository: repo="deb http://apt.dockerproject.org/repo ubuntu-trusty main"
+  apt_repository: repo="deb http://apt.dockerproject.org/repo ubuntu-{{ansible_distribution_release}} main"
 
 - name: purge unnecessary repo
   apt: name=lxc-docker state=absent purge=yes

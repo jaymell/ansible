@@ -1,6 +1,6 @@
 ---
 - name: install docker
-  hosts: localhost
+  hosts: ubu-phys-00
   become: yes
   roles:
   - docker
