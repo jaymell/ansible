@@ -54,12 +54,12 @@
 
 - name: copy server s3 config
   template:
-    src: server-config.json.j2
+    src: server-config-s3.json.j2
     dest: "{{home_dir}}/.config/camlistore/server-config.json"
     owner: "{{ansible_user}}"
     group: "{{ansible_user}}"
     mode: 0600
-  when: use_s3 == true
+  when: use_s3 == "yes"
 
 - name: copy server local config
   template:
@@ -68,7 +68,7 @@
     owner: "{{ansible_user}}"
     group: "{{ansible_user}}"
     mode: 0600
-  when: use_s3 == false
+  when: use_s3 == "no"
 
 - name: enable/start camlistore service
   systemd:
