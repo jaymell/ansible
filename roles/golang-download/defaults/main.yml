@@ -1,6 +1,6 @@
 ---
 golang_source: https://storage.googleapis.com/golang/go1.7.linux-amd64.tar.gz
-user_name: ubuntu
+user_name: "{{ansible_user}}"
 go_path: "/home/{{user_name}}/go"
 go_root_root: /usr/local
 go_root: /usr/local/go

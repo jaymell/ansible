@@ -4,3 +4,4 @@ home_dir: "/home/{{ansible_user}}"
 gpg_src: ~/.config/camlistore/identity-secring.gpg
 gpg_dest: "{{home_dir}}/.config/camlistore/identity-secring.gpg"
 camlistore_db_name: camlistore
+use_s3: false
